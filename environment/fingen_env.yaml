@@ -1,4 +1,4 @@
-name: psp_env
+name: fingen_env
 channels:
   - conda-forge
   - defaults
@@ -32,6 +32,6 @@ dependencies:
     - pillow==7.1.2
     - tensorboard==2.2.1
     - torch==1.6.0
-    - torchvision==0.4.2
-prefix: ~/anaconda3/envs/psp_env
+    - torchvision==0.7.0
+prefix: ~/anaconda3/envs/fingen_env
 

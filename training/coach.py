@@ -165,18 +165,17 @@ class Coach:
         print('Loading dataset for {}'.format(self.opts.dataset_type))
         dataset_args = data_configs.DATASETS[self.opts.dataset_type]
         transforms_dict = dataset_args['transforms'](self.opts).get_transforms()
-        train_dataset_celeba = ImagesDataset(source_root=dataset_args['train_source_root'],
-                                             target_root=dataset_args['train_target_root'],
-                                             source_transform=transforms_dict['transform_source'],
-                                             target_transform=transforms_dict['transform_gt_train'],
-                                             opts=self.opts)
-        test_dataset_celeba = ImagesDataset(source_root=dataset_args['test_source_root'],
-                                            target_root=dataset_args['test_target_root'],
-                                            source_transform=transforms_dict['transform_source'],
-                                            target_transform=transforms_dict['transform_test'],
-                                            opts=self.opts)
-        train_dataset = train_dataset_celeba
-        test_dataset = test_dataset_celeba
+        train_dataset = ImagesDataset(source_root=dataset_args['train_source_root'],
+                                      target_root=dataset_args['train_target_root'],
+                                      source_transform=transforms_dict['transform_source'],
+                                      target_transform=transforms_dict['transform_gt_train'],
+                                      opts=self.opts)
+        test_dataset = ImagesDataset(source_root=dataset_args['test_source_root'],
+                                     target_root=dataset_args['test_target_root'],
+                                     source_transform=transforms_dict['transform_source'],
+                                     target_transform=transforms_dict['transform_test'],
+                                     opts=self.opts)
+
         print("Number of training samples: {}".format(len(train_dataset)))
         print("Number of test samples: {}".format(len(test_dataset)))
         return train_dataset, test_dataset
