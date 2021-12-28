@@ -38,7 +38,7 @@ class TrainOptions:
 		self.parser.add_argument('--l2_lambda_crop', default=0, type=float, help='L2 loss multiplier factor for inner image region')
 		self.parser.add_argument('--fingernet_lambda', default=0, type=float, help='fingernet loss multiplier factor')
 
-		self.parser.add_argument('--stylegan_weights', default=model_paths['stylegan_ffhq'], type=str, help='Path to StyleGAN model weights')
+		self.parser.add_argument('--stylegan_weights', default=model_paths['stylegan_weights'], type=str, help='Path to StyleGAN model weights')
 		self.parser.add_argument('--checkpoint_path', default=None, type=str, help='Path to pSp model checkpoint')
 
 		self.parser.add_argument('--max_steps', default=500000, type=int, help='Maximum number of training steps')

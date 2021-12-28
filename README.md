@@ -121,22 +121,22 @@ python scripts/train.py \
 #### **Reconstruction - Minutiae-to-Vec Encoder**
 ```
 python scripts/train.py \
---dataset_type=ffhq_frontalize \
---exp_dir=/path/to/experiment \
---workers=8 \
---batch_size=8 \
---test_batch_size=8 \
---test_workers=8 \
---val_interval=2500 \
---save_interval=5000 \
---encoder_type=GradualStyleEncoder \
---start_from_latent_avg \
---lpips_lambda=0.08 \
---l2_lambda=0.001 \
---lpips_lambda_crop=0.8 \
---l2_lambda_crop=0.01 \
---id_lambda=1 \
---w_norm_lambda=0.005
+--workers=6
+--batch_size=6
+--test_batch_size=6
+--test_workers=6
+--val_interval=2500
+--save_interval=5000
+--encoder_type=BackboneEncoderUsingLastLayerIntoW
+--lpips_lambda=0.8
+--l2_lambda=1
+--id_lambda=0
+--fingernet_lambda=0
+--generator_image_size=256
+--style_count=14
+--stylegan_weights=/hdd/PycharmProjects/fingerprints/stylegan2-pytorch_origin/checkpoint/480000.pt
+--label_nc=1
+--input_nc=3
 ```
 
 ### Additional Notes
