@@ -67,7 +67,7 @@ cd pixel2style2pixel
 ```
 - Dependencies:  
 We recommend running this repository using [Anaconda](https://docs.anaconda.com/anaconda/install/). 
-All dependencies for defining the environment are provided in `environment/psp_env.yaml`.
+All dependencies for defining the environment are provided in `environment/fingergen_env.yaml`.
 
 ### Inference Notebook
 To help visualize the pSp framework on multiple tasks and to help you get started, we provide a Jupyter notebook found in `notebooks/inference_playground.ipynb` that allows one to visualize the various applications of pSp.   
@@ -120,17 +120,17 @@ python scripts/train.py \
 
 #### **Reconstruction - Minutiae-to-Vec Encoder**
 ```
-python scripts/train.py \
+--dataset_type=nist_sd14_mnt
+--exp_dir=/hdd/PycharmProjects/fingerprints/models/train_mnt_debug
 --workers=6
 --batch_size=6
 --test_batch_size=6
 --test_workers=6
 --val_interval=2500
 --save_interval=5000
---encoder_type=BackboneEncoderUsingLastLayerIntoW
+--encoder_type=MntToVecEncoderEncoderIntoW
 --lpips_lambda=0.8
 --l2_lambda=1
---id_lambda=0
 --fingernet_lambda=0
 --generator_image_size=256
 --style_count=14
