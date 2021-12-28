@@ -14,23 +14,21 @@ sys.path.append("..")
 
 from configs import data_configs
 from datasets.inference_dataset import InferenceDataset
-from utils.common import tensor2im, log_input_image
+from utils.common import tensor2im
 from options.test_options import TestOptions
-from models.psp import pSp
+from models.fingergen import FingerGen
 
 
 def run():
     test_opts = TestOptions().parse()
 
-    if test_opts.resize_factors is not None:
-        assert len(
-            test_opts.resize_factors.split(',')) == 1, "When running inference, provide a single downsampling factor!"
+    if test_opts.resize_factor is not None:
         out_path_results = os.path.join(test_opts.exp_dir, 'inference_results',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
         out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
         out_path_inputs = os.path.join(test_opts.exp_dir, 'inference_inputs',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
     else:
         out_path_results = os.path.join(test_opts.exp_dir, 'inference_results')
         out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled')
@@ -49,7 +47,7 @@ def run():
     if opts.couple_outputs:
         os.makedirs(out_path_coupled, exist_ok=True)
 
-    net = pSp(opts)
+    net = FingerGen(opts, opts.resize_factor)
     net.eval()
     net.cuda()
 
@@ -83,11 +81,11 @@ def run():
         for i in range(opts.test_batch_size):
             result = tensor2im(result_batch[i])
             im_path = dataset.paths[global_i]
-            input_im = log_input_image(input_batch[i], opts)
+            input_im = tensor2im(input_batch[i])
 
             if opts.couple_outputs:
                 resize_amount = (256, 256) if opts.resize_outputs else (1024, 1024)
-                if opts.resize_factors is not None:
+                if opts.resize_factor is not None:
                     # for super resolution, save the original, down-sampled, and output
                     source = Image.open(im_path)
                     res = np.concatenate([np.array(source.resize(resize_amount)),
@@ -100,13 +98,13 @@ def run():
                 Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
             im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
-            if opts.resize_factors is not None:
-                result = result.resize((int(opts.resize_factors), int(opts.resize_factors)))
+            if opts.resize_factor is not None:
+                result = result.resize((int(opts.resize_factor), int(opts.resize_factor)))
             Image.fromarray(np.array(result)).save(im_save_path, dpi=(500, 500))
 
             input_im_save_path = os.path.join(out_path_inputs, os.path.basename(im_path))
-            if opts.resize_factors is not None:
-                input_im = input_im.resize((int(opts.resize_factors), int(opts.resize_factors)))
+            if opts.resize_factor is not None:
+                input_im = input_im.resize((int(opts.resize_factor), int(opts.resize_factor)))
             Image.fromarray(np.array(input_im)).save(input_im_save_path, dpi=(500, 500))
 
             global_i += 1
