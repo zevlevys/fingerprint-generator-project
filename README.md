@@ -35,14 +35,14 @@ This repository contains both training and evaluation scripts.
 ### Fingerprint Synthesis
 Here, we use out framework to generate real-looking fingerprint images using our StyleGAN-based generator trained on NISTSD4 dataset. 
 <p align="center">
-<img src="docs/Synthesis.png" width="600px"/>
+<img src="docs/Synthesis.png" width="500px"/>
 </p>
 
 
 ### Fingerprint Reconstruction
 In this application we want to reconstruct a fingerprint image for it's minutiae information. 
 <p align="center">
-<img src="docs/Reconstruction.png" width="400px"/>
+<img src="docs/Reconstruction.png" width="500px"/>
 </p>
 
 ### Fingerprint Attribute Editor
