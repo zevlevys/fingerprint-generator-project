@@ -224,10 +224,9 @@ class Coach:
                                                     self.train_dataset.target_transform.transforms]
         for i in range(display_count):
             cur_im_data = {
-                # 'input_face': common.log_input_image(x[i], self.opts),
-                'input_face': common.tensor2im(x[i], normalize=normalize_source),
-                'target_face': common.tensor2im(y[i], normalize=normalize_target),
-                'output_face': common.tensor2im(y_hat[i], normalize=normalize_target),
+                'input_image': common.tensor2im(x[i], normalize=normalize_source),
+                'target_image': common.tensor2im(y[i], normalize=normalize_target),
+                'output_image': common.tensor2im(y_hat[i], normalize=normalize_target),
             }
             if id_logs is not None:
                 for key in id_logs[i]:
@@ -236,7 +235,7 @@ class Coach:
         self.log_images(title, im_data=im_data, subscript=subscript)
 
     def log_images(self, name, im_data, subscript=None, log_latest=False):
-        fig = common.vis_faces(im_data)
+        fig = common.vis_images(im_data)
         step = self.global_step
         if log_latest:
             step = 0
