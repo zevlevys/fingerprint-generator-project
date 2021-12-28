@@ -22,15 +22,13 @@ from models.fingergen import FingerGen
 def run():
     test_opts = TestOptions().parse()
 
-    if test_opts.resize_factors is not None:
-        assert len(
-            test_opts.resize_factors.split(',')) == 1, "When running inference, provide a single downsampling factor!"
+    if test_opts.resize_factor is not None:
         out_path_results = os.path.join(test_opts.exp_dir, 'inference_results',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
         out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
         out_path_inputs = os.path.join(test_opts.exp_dir, 'inference_inputs',
-                                        'downsampling_{}'.format(test_opts.resize_factors))
+                                        '{}_resolution'.format(test_opts.resize_factor))
     else:
         out_path_results = os.path.join(test_opts.exp_dir, 'inference_results')
         out_path_coupled = os.path.join(test_opts.exp_dir, 'inference_coupled')
@@ -87,7 +85,7 @@ def run():
 
             if opts.couple_outputs:
                 resize_amount = (256, 256) if opts.resize_outputs else (1024, 1024)
-                if opts.resize_factors is not None:
+                if opts.resize_factor is not None:
                     # for super resolution, save the original, down-sampled, and output
                     source = Image.open(im_path)
                     res = np.concatenate([np.array(source.resize(resize_amount)),
@@ -100,13 +98,13 @@ def run():
                 Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
             im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
-            if opts.resize_factors is not None:
-                result = result.resize((int(opts.resize_factors), int(opts.resize_factors)))
+            if opts.resize_factor is not None:
+                result = result.resize((int(opts.resize_factor), int(opts.resize_factor)))
             Image.fromarray(np.array(result)).save(im_save_path, dpi=(500, 500))
 
             input_im_save_path = os.path.join(out_path_inputs, os.path.basename(im_path))
-            if opts.resize_factors is not None:
-                input_im = input_im.resize((int(opts.resize_factors), int(opts.resize_factors)))
+            if opts.resize_factor is not None:
+                input_im = input_im.resize((int(opts.resize_factor), int(opts.resize_factor)))
             Image.fromarray(np.array(input_im)).save(input_im_save_path, dpi=(500, 500))
 
             global_i += 1
