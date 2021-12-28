@@ -196,14 +196,6 @@ class Coach:
             loss_lpips = self.lpips_loss(y_hat, y)
             loss_dict['loss_lpips'] = float(loss_lpips)
             loss += loss_lpips * self.opts.lpips_lambda
-        if self.opts.lpips_lambda_crop > 0:
-            loss_lpips_crop = self.lpips_loss(y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220])
-            loss_dict['loss_lpips_crop'] = float(loss_lpips_crop)
-            loss += loss_lpips_crop * self.opts.lpips_lambda_crop
-        if self.opts.l2_lambda_crop > 0:
-            loss_l2_crop = F.mse_loss(y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220])
-            loss_dict['loss_l2_crop'] = float(loss_l2_crop)
-            loss += loss_l2_crop * self.opts.l2_lambda_crop
         loss_dict['loss'] = float(loss)
         return loss, loss_dict, id_logs
 
