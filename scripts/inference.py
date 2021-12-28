@@ -49,7 +49,7 @@ def run():
     if opts.couple_outputs:
         os.makedirs(out_path_coupled, exist_ok=True)
 
-    net = FingerGen(opts)
+    net = FingerGen(opts, opts.resize_factor)
     net.eval()
     net.cuda()
 

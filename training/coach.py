@@ -31,7 +31,7 @@ class Coach:
         self.opts.device = self.device
 
         # Initialize network
-        self.net = FingerGen(self.opts).to(self.device)
+        self.net = FingerGen(self.opts, resize_factor=opts.generator_image_size).to(self.device)
 
         # Initialize loss
         if self.opts.lpips_lambda > 0:

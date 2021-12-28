@@ -20,13 +20,14 @@ def get_keys(d, name):
 
 class FingerGen(nn.Module):
 
-    def __init__(self, opts):
+    def __init__(self, opts, resize_factor=256):
         super(FingerGen, self).__init__()
+        self.opts = None
         self.set_opts(opts)
         # Define architecture
         self.encoder = self.set_encoder()
         self.decoder = Generator(opts.generator_image_size, 512, 8, is_gray=opts.label_nc)
-        self.image_pool = torch.nn.AdaptiveAvgPool2d((256, 256))
+        self.image_pool = torch.nn.AdaptiveAvgPool2d((resize_factor, resize_factor))
         # Load weights if needed
         self.load_weights()
 
