@@ -31,7 +31,6 @@ class TrainOptions:
 		self.parser.add_argument('--learn_in_w', action='store_true', help='Whether to learn in w space insteaf of w+')
 
 		self.parser.add_argument('--lpips_lambda', default=0.8, type=float, help='LPIPS loss multiplier factor')
-		self.parser.add_argument('--id_lambda', default=0.1, type=float, help='ID loss multiplier factor')
 		self.parser.add_argument('--l2_lambda', default=1.0, type=float, help='L2 loss multiplier factor')
 		self.parser.add_argument('--w_norm_lambda', default=0, type=float, help='W-norm loss multiplier factor')
 		self.parser.add_argument('--lpips_lambda_crop', default=0, type=float, help='LPIPS loss multiplier factor for inner image region')
