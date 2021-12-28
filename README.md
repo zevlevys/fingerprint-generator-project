@@ -79,8 +79,8 @@ style-mixing.
 Please download the pre-trained models from the following links. Each pSp model contains the entire pSp architecture, including the encoder and decoder weights.
 | Path | Description
 | :--- | :----------
-|[fingerprint_synthesis](https://drive.google.com/file/d/1bMTNWkh5LArlaWSc_wa8VKyq2V42T2z0/view?usp=sharing)  | pSp trained with the FFHQ dataset for StyleGAN inversion.
-|[fingerprint_reconstruction](https://drive.google.com/file/d/1_S4THAzXb-97DbpXmanjHtXRyKxqjARv/view?usp=sharing)  | pSp trained with the FFHQ dataset for face frontalization.
+|[fingerprint_synthesis](https://drive.google.com/file/d/1BRqgVCa5PUeR0Unkz2ym13XXebrjJSpP/view?usp=sharing)  | Model trained with the NIST SD14 dataset for fingerprint synthesis.
+|[fingerprint_reconstruction](https://drive.google.com/file/d/1qTsTKZW13C1FeMhqahiNdpTWqyBDPIwm/view?usp=sharing)  | Model trained with the NIST SD14 dataset for fingerprint reconstruction from minutiae set.
 
 If you wish to use one of the pretrained models for training or inference, you may do so using the flag `--checkpoint_path`.
 
@@ -121,22 +121,22 @@ python scripts/train.py \
 #### **Reconstruction - Minutiae-to-Vec Encoder**
 ```
 python scripts/train.py \
---dataset_type=ffhq_frontalize \
---exp_dir=/path/to/experiment \
---workers=8 \
---batch_size=8 \
---test_batch_size=8 \
---test_workers=8 \
---val_interval=2500 \
---save_interval=5000 \
---encoder_type=GradualStyleEncoder \
---start_from_latent_avg \
---lpips_lambda=0.08 \
---l2_lambda=0.001 \
---lpips_lambda_crop=0.8 \
---l2_lambda_crop=0.01 \
---id_lambda=1 \
---w_norm_lambda=0.005
+--workers=6
+--batch_size=6
+--test_batch_size=6
+--test_workers=6
+--val_interval=2500
+--save_interval=5000
+--encoder_type=BackboneEncoderUsingLastLayerIntoW
+--lpips_lambda=0.8
+--l2_lambda=1
+--id_lambda=0
+--fingernet_lambda=0
+--generator_image_size=256
+--style_count=14
+--stylegan_weights=/hdd/PycharmProjects/fingerprints/stylegan2-pytorch_origin/checkpoint/480000.pt
+--label_nc=1
+--input_nc=3
 ```
 
 ### Additional Notes

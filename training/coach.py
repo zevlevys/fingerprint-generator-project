@@ -13,12 +13,11 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 
 from utils import common, train_utils
-from criteria import id_loss, w_norm
 from configs import data_configs
 from datasets.images_dataset import ImagesDataset
 from criteria.lpips.lpips import LPIPS
 from criteria.fingernet_loss import FingerNetLoss
-from models.psp import pSp
+from models.fingergen import FingerGen
 from training.ranger import Ranger
 
 
@@ -32,15 +31,11 @@ class Coach:
         self.opts.device = self.device
 
         # Initialize network
-        self.net = pSp(self.opts).to(self.device)
+        self.net = FingerGen(self.opts, resize_factor=opts.generator_image_size).to(self.device)
 
         # Initialize loss
         if self.opts.lpips_lambda > 0:
             self.lpips_loss = LPIPS(net_type='alex').to(self.device).eval()
-        if self.opts.id_lambda > 0:
-            self.id_loss = id_loss.IDLoss().to(self.device).eval()
-        if self.opts.w_norm_lambda > 0:
-            self.w_norm_loss = w_norm.WNormLoss(start_from_latent_avg=self.opts.start_from_latent_avg)
         if self.opts.fingernet_lambda > 0:
             self.fingernet_loss = FingerNetLoss(opts.label_nc).to(self.device).eval()
         self.mse_loss = nn.MSELoss().to(self.device).eval()
@@ -170,18 +165,17 @@ class Coach:
         print('Loading dataset for {}'.format(self.opts.dataset_type))
         dataset_args = data_configs.DATASETS[self.opts.dataset_type]
         transforms_dict = dataset_args['transforms'](self.opts).get_transforms()
-        train_dataset_celeba = ImagesDataset(source_root=dataset_args['train_source_root'],
-                                             target_root=dataset_args['train_target_root'],
-                                             source_transform=transforms_dict['transform_source'],
-                                             target_transform=transforms_dict['transform_gt_train'],
-                                             opts=self.opts)
-        test_dataset_celeba = ImagesDataset(source_root=dataset_args['test_source_root'],
-                                            target_root=dataset_args['test_target_root'],
-                                            source_transform=transforms_dict['transform_source'],
-                                            target_transform=transforms_dict['transform_test'],
-                                            opts=self.opts)
-        train_dataset = train_dataset_celeba
-        test_dataset = test_dataset_celeba
+        train_dataset = ImagesDataset(source_root=dataset_args['train_source_root'],
+                                      target_root=dataset_args['train_target_root'],
+                                      source_transform=transforms_dict['transform_source'],
+                                      target_transform=transforms_dict['transform_gt_train'],
+                                      opts=self.opts)
+        test_dataset = ImagesDataset(source_root=dataset_args['test_source_root'],
+                                     target_root=dataset_args['test_target_root'],
+                                     source_transform=transforms_dict['transform_source'],
+                                     target_transform=transforms_dict['transform_test'],
+                                     opts=self.opts)
+
         print("Number of training samples: {}".format(len(train_dataset)))
         print("Number of test samples: {}".format(len(test_dataset)))
         return train_dataset, test_dataset
@@ -194,11 +188,6 @@ class Coach:
             loss_fingernet = self.fingernet_loss(y_hat, y)
             loss_dict['loss_fingernet'] = float(loss_fingernet)
             loss += loss_fingernet * self.opts.fingernet_lambda
-        if self.opts.id_lambda > 0:
-            loss_id, sim_improvement, id_logs = self.id_loss(y_hat, y, x)
-            loss_dict['loss_id'] = float(loss_id)
-            loss_dict['id_improve'] = float(sim_improvement)
-            loss += loss_id * self.opts.id_lambda
         if self.opts.l2_lambda > 0:
             loss_l2 = F.mse_loss(y_hat, y)
             loss_dict['loss_l2'] = float(loss_l2)
@@ -207,18 +196,6 @@ class Coach:
             loss_lpips = self.lpips_loss(y_hat, y)
             loss_dict['loss_lpips'] = float(loss_lpips)
             loss += loss_lpips * self.opts.lpips_lambda
-        if self.opts.lpips_lambda_crop > 0:
-            loss_lpips_crop = self.lpips_loss(y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220])
-            loss_dict['loss_lpips_crop'] = float(loss_lpips_crop)
-            loss += loss_lpips_crop * self.opts.lpips_lambda_crop
-        if self.opts.l2_lambda_crop > 0:
-            loss_l2_crop = F.mse_loss(y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220])
-            loss_dict['loss_l2_crop'] = float(loss_l2_crop)
-            loss += loss_l2_crop * self.opts.l2_lambda_crop
-        if self.opts.w_norm_lambda > 0:
-            loss_w_norm = self.w_norm_loss(latent, self.net.latent_avg)
-            loss_dict['loss_w_norm'] = float(loss_w_norm)
-            loss += loss_w_norm * self.opts.w_norm_lambda
         loss_dict['loss'] = float(loss)
         return loss, loss_dict, id_logs
 
@@ -239,10 +216,9 @@ class Coach:
                                                     self.train_dataset.target_transform.transforms]
         for i in range(display_count):
             cur_im_data = {
-                # 'input_face': common.log_input_image(x[i], self.opts),
-                'input_face': common.tensor2im(x[i], normalize=normalize_source),
-                'target_face': common.tensor2im(y[i], normalize=normalize_target),
-                'output_face': common.tensor2im(y_hat[i], normalize=normalize_target),
+                'input_image': common.tensor2im(x[i], normalize=normalize_source),
+                'target_image': common.tensor2im(y[i], normalize=normalize_target),
+                'output_image': common.tensor2im(y_hat[i], normalize=normalize_target),
             }
             if id_logs is not None:
                 for key in id_logs[i]:
@@ -251,7 +227,7 @@ class Coach:
         self.log_images(title, im_data=im_data, subscript=subscript)
 
     def log_images(self, name, im_data, subscript=None, log_latest=False):
-        fig = common.vis_faces(im_data)
+        fig = common.vis_images(im_data)
         step = self.global_step
         if log_latest:
             step = 0
