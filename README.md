@@ -79,8 +79,8 @@ style-mixing.
 Please download the pre-trained models from the following links. Each pSp model contains the entire pSp architecture, including the encoder and decoder weights.
 | Path | Description
 | :--- | :----------
-|[fingerprint_synthesis](https://drive.google.com/file/d/1bMTNWkh5LArlaWSc_wa8VKyq2V42T2z0/view?usp=sharing)  | pSp trained with the FFHQ dataset for StyleGAN inversion.
-|[fingerprint_reconstruction](https://drive.google.com/file/d/1_S4THAzXb-97DbpXmanjHtXRyKxqjARv/view?usp=sharing)  | pSp trained with the FFHQ dataset for face frontalization.
+|[fingerprint_synthesis](https://drive.google.com/file/d/1BRqgVCa5PUeR0Unkz2ym13XXebrjJSpP/view?usp=sharing)  | Model trained with the NIST SD14 dataset for fingerprint synthesis.
+|[fingerprint_reconstruction](https://drive.google.com/file/d/1qTsTKZW13C1FeMhqahiNdpTWqyBDPIwm/view?usp=sharing)  | Model trained with the NIST SD14 dataset for fingerprint reconstruction from minutiae set.
 
 If you wish to use one of the pretrained models for training or inference, you may do so using the flag `--checkpoint_path`.
 
