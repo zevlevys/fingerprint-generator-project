@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn import Linear, Conv2d, BatchNorm2d, PReLU, Sequential, Module
 
-from models.encoders.helpers import get_blocks, Flatten, bottleneck_IR_SE
+from models.encoders.helpers import get_blocks, Flatten, bottleneck_SE
 from models.stylegan2.model import EqualLinear
 
 
@@ -33,12 +33,10 @@ class GradualStyleBlock(Module):
 
 
 class GradualMntToVecEncoder(Module):
-    def __init__(self, num_layers, mode='ir', opts=None):
+    def __init__(self, opts=None):
         super(GradualMntToVecEncoder, self).__init__()
-        assert num_layers in [50, 100, 152], 'num_layers should be 50,100, or 152'
-        assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
-        blocks = get_blocks(num_layers)
-        unit_module = bottleneck_IR_SE
+        blocks = get_blocks(num_layers=50)
+        unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
                                       BatchNorm2d(64),
                                       PReLU(64))
@@ -114,13 +112,11 @@ class GradualMntToVecEncoder(Module):
 
 
 class MntToVecEncoderEncoderIntoW(Module):
-    def __init__(self, num_layers, mode='ir', opts=None):
+    def __init__(self, opts=None):
         super(MntToVecEncoderEncoderIntoW, self).__init__()
         print('Using BackboneEncoderUsingLastLayerIntoW')
-        assert num_layers in [50, 100, 152], 'num_layers should be 50,100, or 152'
-        assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
-        blocks = get_blocks(num_layers)
-        unit_module = bottleneck_IR_SE
+        blocks = get_blocks(num_layers=50)
+        unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
                                       BatchNorm2d(64),
                                       PReLU(64))
@@ -146,13 +142,11 @@ class MntToVecEncoderEncoderIntoW(Module):
 class MntToVecEncoderEncoderIntoWPlus(Module):
     ''' This encoder was used in our paper [FingerGen](TODO: add link to the paper)'''
 
-    def __init__(self, num_layers, mode='ir', opts=None):
+    def __init__(self, opts=None):
         super(MntToVecEncoderEncoderIntoWPlus, self).__init__()
         print('Using BackboneEncoderUsingLastLayerIntoWPlus')
-        assert num_layers in [50, 100, 152], 'num_layers should be 50,100, or 152'
-        assert mode in ['ir', 'ir_se'], 'mode should be ir or ir_se'
-        blocks = get_blocks(num_layers)
-        unit_module = bottleneck_IR_SE
+        blocks = get_blocks(num_layers=50)
+        unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
                                       BatchNorm2d(64),
                                       PReLU(64))

@@ -32,11 +32,11 @@ class FingerGen(nn.Module):
 
     def set_encoder(self):
         if self.opts.encoder_type == 'GradualStyleEncoder':
-            encoder = encoders.GradualMntToVecEncoder(50, 'ir_se', self.opts)
+            encoder = encoders.GradualMntToVecEncoder(self.opts)
         elif self.opts.encoder_type == 'BackboneEncoderUsingLastLayerIntoW':
-            encoder = encoders.MntToVecEncoderEncoderIntoW(50, 'ir_se', self.opts)
+            encoder = encoders.MntToVecEncoderEncoderIntoW(self.opts)
         elif self.opts.encoder_type == 'BackboneEncoderUsingLastLayerIntoWPlus':
-            encoder = encoders.MntToVecEncoderEncoderIntoWPlus(50, 'ir_se', self.opts)
+            encoder = encoders.MntToVecEncoderEncoderIntoWPlus(self.opts)
         else:
             raise Exception('{} is not a valid encoders'.format(self.opts.encoder_type))
         return encoder
