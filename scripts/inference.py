@@ -16,7 +16,7 @@ from configs import data_configs
 from datasets.inference_dataset import InferenceDataset
 from utils.common import tensor2im
 from options.test_options import TestOptions
-from models.psp import pSp
+from models.fingergen import FingerGen
 
 
 def run():
@@ -49,7 +49,7 @@ def run():
     if opts.couple_outputs:
         os.makedirs(out_path_coupled, exist_ok=True)
 
-    net = pSp(opts)
+    net = FingerGen(opts)
     net.eval()
     net.cuda()
 

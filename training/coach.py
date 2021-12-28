@@ -17,7 +17,7 @@ from configs import data_configs
 from datasets.images_dataset import ImagesDataset
 from criteria.lpips.lpips import LPIPS
 from criteria.fingernet_loss import FingerNetLoss
-from models.psp import pSp
+from models.fingergen import FingerGen
 from training.ranger import Ranger
 
 
@@ -31,7 +31,7 @@ class Coach:
         self.opts.device = self.device
 
         # Initialize network
-        self.net = pSp(self.opts).to(self.device)
+        self.net = FingerGen(self.opts).to(self.device)
 
         # Initialize loss
         if self.opts.lpips_lambda > 0:
