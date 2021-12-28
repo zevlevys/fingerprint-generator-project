@@ -1,4 +1,4 @@
-name: fingen_env
+name: fingergen_env
 channels:
   - conda-forge
   - defaults
@@ -33,5 +33,5 @@ dependencies:
     - tensorboard==2.2.1
     - torch==1.6.0
     - torchvision==0.7.0
-prefix: ~/anaconda3/envs/fingen_env
+prefix: ~/anaconda3/envs/fingergen_env
 

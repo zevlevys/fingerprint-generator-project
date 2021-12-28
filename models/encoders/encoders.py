@@ -35,6 +35,7 @@ class GradualStyleBlock(Module):
 class GradualMntToVecEncoder(Module):
     def __init__(self, opts=None):
         super(GradualMntToVecEncoder, self).__init__()
+        print('Using GradualMntToVecEncoder')
         blocks = get_blocks(num_layers=50)
         unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
@@ -114,7 +115,7 @@ class GradualMntToVecEncoder(Module):
 class MntToVecEncoderEncoderIntoW(Module):
     def __init__(self, opts=None):
         super(MntToVecEncoderEncoderIntoW, self).__init__()
-        print('Using BackboneEncoderUsingLastLayerIntoW')
+        print('Using MntToVecEncoderEncoderIntoW')
         blocks = get_blocks(num_layers=50)
         unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
@@ -144,7 +145,7 @@ class MntToVecEncoderEncoderIntoWPlus(Module):
 
     def __init__(self, opts=None):
         super(MntToVecEncoderEncoderIntoWPlus, self).__init__()
-        print('Using BackboneEncoderUsingLastLayerIntoWPlus')
+        print('Using MntToVecEncoderEncoderIntoWPlus')
         blocks = get_blocks(num_layers=50)
         unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
