@@ -49,12 +49,13 @@ class FingerGen(nn.Module):
             self.decoder.load_state_dict(get_keys(ckpt, 'decoder'), strict=True)
             self.__load_latent_avg(ckpt)
         else:
-            print('Loading encoders weights from irse50!')
-            encoder_ckpt = torch.load(model_paths['ir_se50'])
+            print('Loading encoders weights from pretrained!')
+            encoder_ckpt = torch.load(model_paths['encoder_pretrained'])
             # if input to encoder is not an RGB image, do not load the input layer weights
             if self.opts.label_nc != 0:
                 encoder_ckpt = {k: v for k, v in encoder_ckpt.items() if "input_layer" not in k}
             self.encoder.load_state_dict(encoder_ckpt, strict=False)
+
             print('Loading decoder weights from pretrained!')
             ckpt = torch.load(self.opts.stylegan_weights)
             self.decoder.load_state_dict(ckpt['g_ema'], strict=False)
@@ -69,7 +70,7 @@ class FingerGen(nn.Module):
             codes = x
         else:
             codes = self.encoder(x)
-            # normalize with respect to the center of an average face
+            # normalize with respect to the center of an average image
             if self.opts.start_from_latent_avg:
                 if self.opts.learn_in_w:
                     codes = codes + self.latent_avg.repeat(codes.shape[0], 1)
