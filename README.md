@@ -21,7 +21,7 @@ allows the user to control specific visual attributes of the
 generated fingerprint.
 
 <p align="center">
-<img src="docs/teaser.jpg" width="800px"/>
+<img src="docs/Teaser.png" width="800px"/>
 </p>
 
 ## Description   
