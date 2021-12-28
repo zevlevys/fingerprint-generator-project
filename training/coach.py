@@ -13,7 +13,6 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 
 from utils import common, train_utils
-from criteria import w_norm
 from configs import data_configs
 from datasets.images_dataset import ImagesDataset
 from criteria.lpips.lpips import LPIPS
@@ -37,8 +36,6 @@ class Coach:
         # Initialize loss
         if self.opts.lpips_lambda > 0:
             self.lpips_loss = LPIPS(net_type='alex').to(self.device).eval()
-        if self.opts.w_norm_lambda > 0:
-            self.w_norm_loss = w_norm.WNormLoss(start_from_latent_avg=self.opts.start_from_latent_avg)
         if self.opts.fingernet_lambda > 0:
             self.fingernet_loss = FingerNetLoss(opts.label_nc).to(self.device).eval()
         self.mse_loss = nn.MSELoss().to(self.device).eval()
@@ -208,10 +205,6 @@ class Coach:
             loss_l2_crop = F.mse_loss(y_hat[:, :, 35:223, 32:220], y[:, :, 35:223, 32:220])
             loss_dict['loss_l2_crop'] = float(loss_l2_crop)
             loss += loss_l2_crop * self.opts.l2_lambda_crop
-        if self.opts.w_norm_lambda > 0:
-            loss_w_norm = self.w_norm_loss(latent, self.net.latent_avg)
-            loss_dict['loss_w_norm'] = float(loss_w_norm)
-            loss += loss_w_norm * self.opts.w_norm_lambda
         loss_dict['loss'] = float(loss)
         return loss, loss_dict, id_logs
 

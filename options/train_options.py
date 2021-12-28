@@ -32,7 +32,6 @@ class TrainOptions:
 
 		self.parser.add_argument('--lpips_lambda', default=0.8, type=float, help='LPIPS loss multiplier factor')
 		self.parser.add_argument('--l2_lambda', default=1.0, type=float, help='L2 loss multiplier factor')
-		self.parser.add_argument('--w_norm_lambda', default=0, type=float, help='W-norm loss multiplier factor')
 		self.parser.add_argument('--lpips_lambda_crop', default=0, type=float, help='LPIPS loss multiplier factor for inner image region')
 		self.parser.add_argument('--l2_lambda_crop', default=0, type=float, help='L2 loss multiplier factor for inner image region')
 		self.parser.add_argument('--fingernet_lambda', default=0, type=float, help='fingernet loss multiplier factor')
