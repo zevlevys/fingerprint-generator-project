@@ -14,7 +14,7 @@ import torchvision.transforms as transforms
 
 from utils import common, train_utils
 from configs import data_configs
-from datasets.images_dataset import ImagesDataset
+from datasets.images_dataset import ImageToImageDataset
 from criteria.lpips.lpips import LPIPS
 from criteria.fingernet_loss import FingerNetLoss
 from models.fingergen import FingerGen
@@ -165,16 +165,16 @@ class Coach:
         print('Loading dataset for {}'.format(self.opts.dataset_type))
         dataset_args = data_configs.DATASETS[self.opts.dataset_type]
         transforms_dict = dataset_args['transforms'](self.opts).get_transforms()
-        train_dataset = ImagesDataset(source_root=dataset_args['train_source_root'],
-                                      target_root=dataset_args['train_target_root'],
-                                      source_transform=transforms_dict['transform_source'],
-                                      target_transform=transforms_dict['transform_gt_train'],
-                                      opts=self.opts)
-        test_dataset = ImagesDataset(source_root=dataset_args['test_source_root'],
-                                     target_root=dataset_args['test_target_root'],
-                                     source_transform=transforms_dict['transform_source'],
-                                     target_transform=transforms_dict['transform_test'],
-                                     opts=self.opts)
+        train_dataset = ImageToImageDataset(source_root=dataset_args['train_source_root'],
+                                            target_root=dataset_args['train_target_root'],
+                                            source_transform=transforms_dict['transform_source'],
+                                            target_transform=transforms_dict['transform_gt_train'],
+                                            opts=self.opts)
+        test_dataset = ImageToImageDataset(source_root=dataset_args['test_source_root'],
+                                           target_root=dataset_args['test_target_root'],
+                                           source_transform=transforms_dict['transform_source'],
+                                           target_transform=transforms_dict['transform_test'],
+                                           opts=self.opts)
 
         print("Number of training samples: {}".format(len(train_dataset)))
         print("Number of test samples: {}".format(len(test_dataset)))

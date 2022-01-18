@@ -17,4 +17,18 @@ DATASETS = {
 		'test_source_root': dataset_paths['nist_sd4_mnt_test'],
 		'test_target_root': dataset_paths['nist_sd4_mnt_gt_test'],
 	},
+	'nist_sd14_synthesis': {
+		'transforms': transforms_config.FingerprintSynthesisTransforms,
+		'train_source_root': dataset_paths['nist_sd4_mnt_train'],
+		'train_target_root': dataset_paths['nist_sd4_mnt_gt_train'],
+		'test_source_root': dataset_paths['nist_sd4_mnt_test'],
+		'test_target_root': dataset_paths['nist_sd4_mnt_gt_test'],
+	},
+	'nist_sd4_synthesis': {
+		'transforms': transforms_config.FingerprintSynthesisTransforms,
+		'train_source_root': dataset_paths['nist_sd4_mnt_train'],
+		'train_target_root': dataset_paths['nist_sd4_mnt_gt_train'],
+		'test_source_root': dataset_paths['nist_sd4_mnt_test'],
+		'test_target_root': dataset_paths['nist_sd4_mnt_gt_test'],
+	},
 }
