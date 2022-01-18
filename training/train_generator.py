@@ -1,4 +1,3 @@
-import argparse
 import math
 import os
 import random
@@ -8,17 +7,14 @@ import torch.distributed as dist
 from torch import nn, autograd, optim
 from torch.nn import functional as F
 from torch.utils import data
-from torchvision import transforms, utils
+from torchvision import utils
 from tqdm import tqdm
 
-try:
-    import wandb
-
-except ImportError:
-    wandb = None
-
+# dataset
+from configs import data_configs
+from datasets.images_dataset import ImageDataset
 from models.stylegan2.model import Generator, Discriminator
-from training.dataset import MultiResolutionDataset
+from options.generator_train_options import GeneratorTrainOptions
 from training.distributed import (
     get_rank,
     synchronize,
@@ -123,16 +119,14 @@ def set_grad_none(model, targets):
 def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device):
     loader = sample_data(loader)
 
-    pbar = range(args.iter)
+    pbar = range(args.max_steps)
 
     if get_rank() == 0:
         pbar = tqdm(pbar, initial=args.start_iter, dynamic_ncols=True, smoothing=0.01)
 
     mean_path_length = 0
 
-    d_loss_val = 0
     r1_loss = torch.tensor(0.0, device=device)
-    g_loss_val = 0
     path_loss = torch.tensor(0.0, device=device)
     path_lengths = torch.tensor(0.0, device=device)
     mean_path_length_avg = 0
@@ -148,7 +142,6 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
 
     accum = 0.5 ** (32 / (10 * 1000))
     ada_aug_p = args.augment_p if args.augment_p > 0 else 0.0
-    r_t_stat = 0
 
     if args.augment and args.augment_p == 0:
         ada_augment = AdaptiveAugment(args.ada_target, args.ada_length, 256, device)
@@ -158,7 +151,7 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
     for idx in pbar:
         i = idx + args.start_iter
 
-        if i > args.iter:
+        if i > args.max_steps:
             print("Done!")
 
             break
@@ -169,12 +162,12 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
         requires_grad(generator, False)
         requires_grad(discriminator, True)
 
-        noise = mixing_noise(args.batch, args.latent, args.mixing, device)
+        noise = mixing_noise(args.batch_size, args.latent, args.mixing, device)
         fake_img, _ = generator(noise)
 
         if args.augment:
-            real_img_aug, _ = augment(real_img, ada_aug_p, is_gray=args.convert_to_gray)
-            fake_img, _ = augment(fake_img, ada_aug_p, is_gray=args.convert_to_gray)
+            real_img_aug, _ = augment(real_img, ada_aug_p, is_gray=args.is_gray)
+            fake_img, _ = augment(fake_img, ada_aug_p, is_gray=args.is_gray)
 
         else:
             real_img_aug = real_img
@@ -193,7 +186,6 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
 
         if args.augment and args.augment_p == 0:
             ada_aug_p = ada_augment.tune(real_pred)
-            r_t_stat = ada_augment.r_t_stat
 
         d_regularize = i % args.d_reg_every == 0
 
@@ -212,11 +204,11 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
         requires_grad(generator, True)
         requires_grad(discriminator, False)
 
-        noise = mixing_noise(args.batch, args.latent, args.mixing, device)
+        noise = mixing_noise(args.batch_size, args.latent, args.mixing, device)
         fake_img, _ = generator(noise)
 
         if args.augment:
-            fake_img, _ = augment(fake_img, ada_aug_p, is_gray=args.convert_to_gray)
+            fake_img, _ = augment(fake_img, ada_aug_p, is_gray=args.is_gray)
 
         fake_pred = discriminator(fake_img)
         g_loss = g_nonsaturating_loss(fake_pred)
@@ -230,7 +222,7 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
         g_regularize = i % args.g_reg_every == 0
 
         if g_regularize:
-            path_batch_size = max(1, args.batch // args.path_batch_shrink)
+            path_batch_size = max(1, args.batch_size // args.path_batch_shrink)
             noise = mixing_noise(path_batch_size, args.latent, args.mixing, device)
             fake_img, latents = generator(noise, return_latents=True)
 
@@ -263,9 +255,6 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
         g_loss_val = loss_reduced["g"].mean().item()
         r1_val = loss_reduced["r1"].mean().item()
         path_loss_val = loss_reduced["path"].mean().item()
-        real_score_val = loss_reduced["real_score"].mean().item()
-        fake_score_val = loss_reduced["fake_score"].mean().item()
-        path_length_val = loss_reduced["path_length"].mean().item()
 
         if get_rank() == 0:
             pbar.set_description(
@@ -276,35 +265,19 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
                 )
             )
 
-            if wandb and args.wandb:
-                wandb.log(
-                    {
-                        "Generator": g_loss_val,
-                        "Discriminator": d_loss_val,
-                        "Augment": ada_aug_p,
-                        "Rt": r_t_stat,
-                        "R1": r1_val,
-                        "Path Length Regularization": path_loss_val,
-                        "Mean Path Length": mean_path_length,
-                        "Real Score": real_score_val,
-                        "Fake Score": fake_score_val,
-                        "Path Length": path_length_val,
-                    }
-                )
-
-            if i % 500 == 0:
+            if i % args.image_interval == 0:
                 with torch.no_grad():
                     g_ema.eval()
                     sample, _ = g_ema([sample_z])
                     utils.save_image(
                         sample,
-                        f"{args.output_folder_path}/sample/{str(i).zfill(6)}.png",
+                        f"{args.exp_dir}/sample/{str(i).zfill(6)}.png",
                         nrow=int(args.n_sample ** 0.5),
                         normalize=True,
                         range=(-1, 1),
                     )
 
-            if i % 10000 == 0:
+            if i % args.save_interval == 0:
                 torch.save(
                     {
                         "g": g_module.state_dict(),
@@ -315,147 +288,44 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
                         "args": args,
                         "ada_aug_p": ada_aug_p,
                     },
-                    f"{args.output_folder_path}/checkpoint/{str(i).zfill(6)}.pt",
+                    f"{args.exp_dir}/checkpoint/{str(i).zfill(6)}.pt",
                 )
 
 
 if __name__ == "__main__":
-    device = "cuda"
-
-    parser = argparse.ArgumentParser(description="StyleGAN2 trainer")
-
-    parser.add_argument("path", type=str, help="path to the lmdb dataset")
-    parser.add_argument(
-        "--iter", type=int, default=800000, help="total training iterations"
-    )
-    parser.add_argument(
-        "--batch", type=int, default=16, help="batch sizes for each gpus"
-    )
-    parser.add_argument(
-        "--n_sample",
-        type=int,
-        default=64,
-        help="number of the samples generated during training",
-    )
-    parser.add_argument(
-        "--size", type=int, default=256, help="image sizes for the model"
-    )
-    parser.add_argument(
-        "--r1", type=float, default=10, help="weight of the r1 regularization"
-    )
-    parser.add_argument(
-        "--path_regularize",
-        type=float,
-        default=2,
-        help="weight of the path length regularization",
-    )
-    parser.add_argument(
-        "--path_batch_shrink",
-        type=int,
-        default=2,
-        help="batch size reducing factor for the path length regularization (reduce memory consumption)",
-    )
-    parser.add_argument(
-        "--d_reg_every",
-        type=int,
-        default=16,
-        help="interval of the applying r1 regularization",
-    )
-    parser.add_argument(
-        "--g_reg_every",
-        type=int,
-        default=4,
-        help="interval of the applying path length regularization",
-    )
-    parser.add_argument(
-        "--mixing", type=float, default=0.9, help="probability of latent code mixing"
-    )
-    parser.add_argument(
-        "--ckpt",
-        type=str,
-        default=None,
-        help="path to the checkpoints to resume training",
-    )
-    parser.add_argument("--lr", type=float, default=0.002, help="learning rate")
-    parser.add_argument(
-        "--channel_multiplier",
-        type=int,
-        default=2,
-        help="channel multiplier factor for the model. config-f = 2, else = 1",
-    )
-    parser.add_argument(
-        "--wandb", action="store_true", help="use weights and biases logging"
-    )
-    parser.add_argument(
-        "--local_rank", type=int, default=0, help="local rank for distributed training"
-    )
-    parser.add_argument(
-        "--augment", action="store_true", help="apply non leaking augmentation"
-    )
-    parser.add_argument(
-        "--augment_p",
-        type=float,
-        default=0,
-        help="probability of applying augmentation. 0 = use adaptive augmentation",
-    )
-    parser.add_argument(
-        "--ada_target",
-        type=float,
-        default=0.6,
-        help="target augmentation probability for adaptive augmentation",
-    )
-    parser.add_argument(
-        "--ada_length",
-        type=int,
-        default=500 * 1000,
-        help="target duraing to reach augmentation probability for adaptive augmentation",
-    )
-    parser.add_argument(
-        "--ada_every",
-        type=int,
-        default=256,
-        help="probability update interval of the adaptive augmentation",
-    )
-    parser.add_argument(
-        "--convert_to_gray", action="store_true", help="convert image to gray"
-    )
-    parser.add_argument(
-        "--output_folder_path",
-        type=str,
-        default='',
-        help="path to the save outputs- checkpoints and samples",
-    )
-
-    args = parser.parse_args()
 
     # Set random seed
     random_seed = 1
     torch.manual_seed(random_seed)
-
-    import random
     random.seed(random_seed)
+
+    args = GeneratorTrainOptions().parse()
 
     n_gpu = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     args.distributed = n_gpu > 1
 
     if args.distributed:
+        args.local_rank = 0
         torch.cuda.set_device(args.local_rank)
         torch.distributed.init_process_group(backend="nccl", init_method="env://")
         synchronize()
 
+    device = "cuda"
     args.latent = 512
     args.n_mlp = 8
 
     args.start_iter = 0
 
     generator = Generator(
-        args.size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier, is_gray=args.convert_to_gray
+        args.generator_image_size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier,
+        is_gray=args.is_gray
     ).to(device)
     discriminator = Discriminator(
-        args.size, channel_multiplier=args.channel_multiplier, is_gray=args.convert_to_gray
+        args.generator_image_size, channel_multiplier=args.channel_multiplier, is_gray=args.is_gray
     ).to(device)
     g_ema = Generator(
-        args.size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier, is_gray=args.convert_to_gray
+        args.generator_image_size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier,
+        is_gray=args.is_gray
     ).to(device)
     g_ema.eval()
     accumulate(g_ema, generator, 0)
@@ -465,19 +335,19 @@ if __name__ == "__main__":
 
     g_optim = optim.Adam(
         generator.parameters(),
-        lr=args.lr * g_reg_ratio,
+        lr=args.learning_rate * g_reg_ratio,
         betas=(0 ** g_reg_ratio, 0.99 ** g_reg_ratio),
     )
     d_optim = optim.Adam(
         discriminator.parameters(),
-        lr=args.lr * d_reg_ratio,
+        lr=args.learning_rate * d_reg_ratio,
         betas=(0 ** d_reg_ratio, 0.99 ** d_reg_ratio),
     )
 
-    if args.ckpt is not None:
-        print("load model:", args.ckpt)
+    if args.checkpoint_path is not None:
+        print("load model:", args.checkpoint_path)
 
-        ckpt = torch.load(args.ckpt, map_location=lambda storage, loc: storage)
+        ckpt = torch.load(args.checkpoint_path, map_location=lambda storage, loc: storage)
 
         try:
             ckpt_name = os.path.basename(args.ckpt)
@@ -508,38 +378,21 @@ if __name__ == "__main__":
             broadcast_buffers=False,
         )
 
-    if args.convert_to_gray:
-        transform = transforms.Compose(
-            [
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                transforms.Normalize(0.5, 0.5, inplace=True)
-                ,
-            ]
-        )
+    dataset_args = data_configs.DATASETS[args.dataset_type]
+    transforms_dict = dataset_args['transforms'](args).get_transforms()
+    dataset = ImageDataset(target_root=dataset_args['train_target_root'],
+                           target_transform=transforms_dict['transform_gt_train'],
+                           opts=args)
 
-    else:
-        transform = transforms.Compose(
-            [
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), inplace=True),
-            ]
-        )
-
-    dataset = MultiResolutionDataset(args.path, transform, args.size, args.convert_to_gray)
     loader = data.DataLoader(
         dataset,
-        batch_size=args.batch,
+        batch_size=args.batch_size,
         sampler=data_sampler(dataset, shuffle=True, distributed=args.distributed),
         drop_last=True,
     )
 
-    if get_rank() == 0 and wandb is not None and args.wandb:
-        wandb.init(project="stylegan 2")
-
     for output_folder in ['checkpoint', 'sample']:
-        if not os.path.exists(f'{args.output_folder_path}/{output_folder}'):
-            os.makedirs(f'{args.output_folder_path}/{output_folder}')
+        if not os.path.exists(f'{args.exp_dir}/{output_folder}'):
+            os.makedirs(f'{args.exp_dir}/{output_folder}')
 
     train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device)
