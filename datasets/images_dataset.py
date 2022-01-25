@@ -3,7 +3,7 @@ from PIL import Image
 from utils import data_utils
 
 
-class ImagesDataset(Dataset):
+class ImageToImageDataset(Dataset):
 
 	def __init__(self, source_root, target_root, opts, target_transform=None, source_transform=None):
 		self.source_paths = sorted(data_utils.make_dataset(source_root))
@@ -21,7 +21,7 @@ class ImagesDataset(Dataset):
 		from_im = from_im.convert('RGB') if self.opts.input_nc == 3 else from_im.convert('L')
 
 		to_path = self.target_paths[index]
-		to_im = Image.open(to_path).convert('RGB') if self.opts.label_nc == 0 else Image.open(to_path).convert('L')
+		to_im = Image.open(to_path).convert('RGB') if self.opts.label_nc == 3 else Image.open(to_path).convert('L')
 		if self.target_transform:
 			to_im = self.target_transform(to_im)
 
@@ -31,3 +31,22 @@ class ImagesDataset(Dataset):
 			from_im = to_im
 
 		return from_im, to_im
+
+
+class ImageDataset(Dataset):
+
+	def __init__(self, target_root, opts, target_transform=None):
+		self.target_paths = sorted(data_utils.make_dataset(target_root))
+		self.target_transform = target_transform
+		self.opts = opts
+
+	def __len__(self):
+		return len(self.target_paths)
+
+	def __getitem__(self, index):
+		to_path = self.target_paths[index]
+		to_im = Image.open(to_path).convert('RGB') if self.opts.label_nc == 3 else Image.open(to_path).convert('L')
+		if self.target_transform:
+			to_im = self.target_transform(to_im)
+
+		return to_im

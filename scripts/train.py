@@ -10,7 +10,7 @@ sys.path.append(".")
 sys.path.append("..")
 
 from options.train_options import TrainOptions
-from training.coach import Coach
+from training.train_mnt_encoder import Coach
 
 
 def main():
