@@ -8,7 +8,6 @@ from models.stylegan2.model import EqualLinear
 class MntToVecEncoderEncoderIntoW(Module):
     def __init__(self, opts=None):
         super(MntToVecEncoderEncoderIntoW, self).__init__()
-        print('Using MntToVecEncoderEncoderIntoW')
         blocks = get_blocks(num_layers=50)
         unit_module = bottleneck_SE
         self.input_layer = Sequential(Conv2d(opts.input_nc, 64, (3, 3), 1, 1, bias=False),
