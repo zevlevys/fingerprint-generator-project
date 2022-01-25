@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from configs.paths_config import model_paths
 
 
-class TrainOptions:
+class MntEncoderTrainOptions:
 
     def __init__(self):
         self.parser = ArgumentParser()
@@ -20,9 +20,6 @@ class TrainOptions:
                                  help='Path to StyleGAN model weights. used only when checkpoint_path is None')
 
         # Architecture params
-        self.parser.add_argument('--encoder_type', default='GradualMntToVecEncoder', type=str,
-                                 help='Which encoder to use [GradualMntToVecEncoder, MntToVecEncoderEncoderIntoW,'
-                                      'MntToVecEncoderEncoderIntoWPlus')
         self.parser.add_argument('--generator_image_size', default=256, type=int,
                                  help='Image size for stylegan2 generator')
         self.parser.add_argument('--style_count', default=14, type=int, help='Number of style vectors')
