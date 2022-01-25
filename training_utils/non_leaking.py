@@ -3,7 +3,7 @@ import math
 import torch
 from torch.nn import functional as F
 
-from training.distributed import reduce_sum
+from training_utils.distributed import reduce_sum
 from models.stylegan2.op import upfirdn2d
 
 

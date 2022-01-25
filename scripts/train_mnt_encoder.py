@@ -1,7 +1,12 @@
+import json
 import os
+import pprint
+import random
 
 import matplotlib
 import matplotlib.pyplot as plt
+
+from options.mnt_encoder_train_options import MntEncoderTrainOptions
 
 matplotlib.use('Agg')
 
@@ -18,10 +23,10 @@ from datasets.images_dataset import ImageToImageDataset
 from criteria.lpips.lpips import LPIPS
 from criteria.fingernet_loss import FingerNetLoss
 from models.fingergen import FingerGen
-from training.ranger import Ranger
+from training_utils.ranger import Ranger
 
 
-class Coach:
+class MntEncoderCoach:
     def __init__(self, opts):
         self.opts = opts
 
@@ -103,7 +108,7 @@ class Coach:
                         self.checkpoint_me(loss_dict, is_best=False)
 
                 if self.global_step == self.opts.max_steps:
-                    print('OMG, finished training!')
+                    print('OMG, finished training_utils!')
                     break
 
                 self.global_step += 1
@@ -176,7 +181,7 @@ class Coach:
                                            target_transform=transforms_dict['transform_test'],
                                            opts=self.opts)
 
-        print("Number of training samples: {}".format(len(train_dataset)))
+        print("Number of training_utils samples: {}".format(len(train_dataset)))
         print("Number of test samples: {}".format(len(test_dataset)))
         return train_dataset, test_dataset
 
@@ -244,7 +249,32 @@ class Coach:
             'state_dict': self.net.state_dict(),
             'opts': vars(self.opts)
         }
-        # save the latent avg in state_dict for inference if truncation of w was used during training
+        # save the latent avg in state_dict for inference if truncation of w was used during training_utils
         if self.opts.start_from_latent_avg:
             save_dict['latent_avg'] = self.net.latent_avg
         return save_dict
+
+
+if __name__ == "__main__":
+    # Set random seed
+    random_seed = 1
+    torch.manual_seed(random_seed)
+    random.seed(random_seed)
+
+    opts = MntEncoderTrainOptions().parse()
+    if os.path.exists(opts.exp_dir):
+        if len(os.listdir(opts.exp_dir)) > 1:
+            ans = input('Oops... {} already exists. Do you wish to continue training_utils? [yes/no] '.format(opts.exp_dir))
+            if ans == 'no':
+                raise Exception('stop training_utils! Please change exp_dir argument.'.format(opts.exp_dir))
+
+    else:
+        os.makedirs(opts.exp_dir)
+
+    opts_dict = vars(opts)
+    pprint.pprint(opts_dict)
+    with open(os.path.join(opts.exp_dir, 'opt.json'), 'w') as f:
+        json.dump(opts_dict, f, indent=4, sort_keys=True)
+
+    coach = MntEncoderCoach(opts)
+    coach.train()

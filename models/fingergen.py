@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use('Agg')
 import torch
 from torch import nn
-from models.encoders import encoders
+from models.encoders.encoders import MntToVecEncoderEncoderIntoW
 from models.stylegan2.model import Generator
 from configs.paths_config import model_paths
 
@@ -19,28 +19,18 @@ def get_keys(d, name):
 
 
 class FingerGen(nn.Module):
-
     def __init__(self, opts, resize_factor=256):
         super(FingerGen, self).__init__()
         self.opts = None
         self.set_opts(opts)
+
         # Define architecture
-        self.encoder = self.set_encoder()
+        self.encoder = MntToVecEncoderEncoderIntoW(self.opts)
         self.decoder = Generator(opts.generator_image_size, 512, 8, is_gray=opts.label_nc)
         self.image_pool = torch.nn.AdaptiveAvgPool2d((resize_factor, resize_factor))
+
         # Load weights if needed
         self.load_weights()
-
-    def set_encoder(self):
-        if self.opts.encoder_type == 'GradualMntToVecEncoder':
-            encoder = encoders.GradualMntToVecEncoder(self.opts)
-        elif self.opts.encoder_type == 'MntToVecEncoderEncoderIntoW':
-            encoder = encoders.MntToVecEncoderEncoderIntoW(self.opts)
-        elif self.opts.encoder_type == 'MntToVecEncoderEncoderIntoWPlus':
-            encoder = encoders.MntToVecEncoderEncoderIntoWPlus(self.opts)
-        else:
-            raise Exception('{} is not a valid encoders'.format(self.opts.encoder_type))
-        return encoder
 
     def load_weights(self):
         if self.opts.checkpoint_path is not None:
