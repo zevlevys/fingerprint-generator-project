@@ -46,13 +46,14 @@ class GeneratorCoach:
 
         accumulate(self.g_ema, self.generator, 0)
 
-        if self.opts.checkpoint_path is not None:
-            self.load_models()
-
         # Initialize optimizer
         g_reg_ratio = self.opts.g_reg_every / (self.opts.g_reg_every + 1)
         d_reg_ratio = self.opts.d_reg_every / (self.opts.d_reg_every + 1)
         self.g_optim, self.d_optim = self.configure_optimizers(d_reg_ratio, g_reg_ratio)
+
+        # Load model weights
+        if self.opts.checkpoint_path is not None:
+            self.load_models()
 
         # Initialize dataset
         self.loader = self.configure_dataset()
@@ -80,7 +81,7 @@ class GeneratorCoach:
         print("load model:", self.opts.checkpoint_path)
         ckpt = torch.load(self.opts.checkpoint_path, map_location=lambda storage, loc: storage)
         try:
-            ckpt_name = os.path.basename(self.opts.ckpt)
+            ckpt_name = os.path.basename(self.opts.checkpoint_path)
             self.opts.start_iter = int(os.path.splitext(ckpt_name)[0])
 
         except ValueError:
