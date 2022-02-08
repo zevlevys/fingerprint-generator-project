@@ -135,7 +135,7 @@ python scripts/train_mnt_encoder.py
 - If you wish to resume from a specific checkpoint, you may do so using `--checkpoint_path`.
 
 ## Inference
-The main training scripts can be found in `scripts/inference_generator.py` and `scripts/inference_mnt_encoder.py` for synthesis an reconstruction tasks, respectively.
+The main inference scripts can be found in `scripts/inference_generator.py` and `scripts/inference_mnt_encoder.py` for synthesis and reconstruction tasks, respectively.
 
 #### Synthesis
 ```
@@ -160,7 +160,38 @@ python scripts/inference_mnt_encoder.py \
 - During inference, the options used during training are loaded from the saved checkpoint and are then updated using the 
 test options passed to the inference script.  For example, there is no need to pass `--dataset_type` or `--label_nc` to the 
  inference script, as they are taken from the loaded `opts`.
- 
+
+### Fingerprint Attribute Editor
+The main scripts can be found in `fingerprint_attribute_editor/closed_form_factorization.py` and `fingerprint_attribute_editor/attribute_editor.py` for calculating and applying the latent semantic directions, respectively.
+
+#### Closed form factorization
+This script is used to estimate the latent semantic directions in w that modify particular fingerprint attributes while preserving their identity
+```
+python fingerprint_attribute_editor/closed_form_factorization.py
+--exp_dir=<OUTPUT FOLDER PATH>
+--checkpoint_path=<PATH TO PRETRAINED STYLEGAN2 MODEL>
+```
+
+#### Attribute Editor
+This script is used to apply on of the latent semantic directions in order to edit the generated fingerprint attributes.
+
+```
+python fingerprint_attribute_editor/attribute_editor.py
+--exp_dir=<OUTPUT FOLDER PATH>
+--checkpoint_path=<PATH TO PRETRAINED STYLEGAN2 MODEL>
+--factor_path=<PATH TO facor.pt FILE (the output of closed_form_factorization.py>
+--index=22
+--degree=5
+--n_sample=1 
+--is_gray
+--resize_factor=512
+--number_of_outputs=5
+```
+
+##### Additional Notes
+- The output of the closed_form_factorization.py script, factor.pt file, will be saved to exp_dir.
+- The attribute_editor.py script will output three different images, backward, original and forward, for each generated fingerprint.
+- See `fingerprint_attribute_editor/attribute_editor_options.py` for all attribute_editor flags. 
 
 
 ## Credits
