@@ -6,7 +6,7 @@ import random
 import matplotlib
 import matplotlib.pyplot as plt
 
-from options.mnt_encoder_train_options import MntEncoderTrainOptions
+from options.train_mnt_encoder_options import MntEncoderTrainOptions
 
 matplotlib.use('Agg')
 

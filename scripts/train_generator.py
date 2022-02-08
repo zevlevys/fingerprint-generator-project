@@ -15,7 +15,7 @@ from tqdm import tqdm
 from configs import data_configs
 from datasets.images_dataset import ImageDataset
 from models.stylegan2.model import Generator, Discriminator
-from options.generator_train_options import GeneratorTrainOptions
+from options.train_generator_options import GeneratorTrainOptions
 from training_utils.distributed import (
     reduce_loss_dict,
     reduce_sum,
