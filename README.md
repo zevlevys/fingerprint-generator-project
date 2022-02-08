@@ -170,8 +170,8 @@ This script is used to estimate the latent semantic directions in w that modify 
 python fingerprint_attribute_editor/closed_form_factorization.py
 --exp_dir=<OUTPUT FOLDER PATH>
 --checkpoint_path=<PATH TO PRETRAINED STYLEGAN2 MODEL>
-
 ```
+
 #### Attribute Editor
 This script is used to apply on of the latent semantic directions in order to edit the generated fingerprint attributes.
 
