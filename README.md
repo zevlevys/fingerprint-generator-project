@@ -92,7 +92,7 @@ If you wish to use one of the pretrained models for training or inference, you m
     1. `data_configs.py` to define your data paths.
     2. `transforms_configs.py` to define your own data transforms.
 
-### Training
+### Training Scripts
 The main training scripts can be found in `scripts/train_generator.py` and `scripts/train_mnt_encoder.py` for synthesis an reconstruction tasks, respectively.   
 Intermediate training results are saved to `opts.exp_dir`. This includes checkpoints, train outputs, and test outputs.  
 Additionally, if you have tensorboard installed, you can visualize tensorboard logs in `opts.exp_dir/logs`.
@@ -130,14 +130,14 @@ python scripts/train_mnt_encoder.py
 --save_interval=5000
 ```
 
-#### Additional Notes
+##### Additional Notes
 - See `options/train_options.py` for all training-specific flags.
 - If you wish to resume from a specific checkpoint, you may do so using `--checkpoint_path`.
 
 ## Inference
 The main training scripts can be found in `scripts/inference_generator.py` and `scripts/inference_mnt_encoder.py` for synthesis an reconstruction tasks, respectively.
 
-### Synthesis - Fingerprint Generator
+#### Synthesis
 ```
 python scripts/inference_generator.py \
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -146,7 +146,7 @@ python scripts/inference_generator.py \
 --n_image=20
 ```
 
-### Reconstruction - Minutiae-to-Vec Encoder
+#### Reconstruction
 ```
 python scripts/inference_mnt_encoder.py \
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -155,7 +155,7 @@ python scripts/inference_mnt_encoder.py \
 --resize_output
 ```
 
-#### Additional Notes
+##### Additional Notes
 - See `options/test_options.py` for all test-specific flags.
 - During inference, the options used during training are loaded from the saved checkpoint and are then updated using the 
 test options passed to the inference script.  For example, there is no need to pass `--dataset_type` or `--label_nc` to the 
