@@ -173,7 +173,7 @@ python fingerprint_attribute_editor/closed_form_factorization.py
 
 ```
 
-#### Fingerprint Attribute Editor
+#### Attribute Editor
 This script is used to apply on of the latent semantic directions in order to edit the generated fingerprint attributes.
 
 ```
