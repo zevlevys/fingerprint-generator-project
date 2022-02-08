@@ -1,14 +1,14 @@
 from argparse import ArgumentParser
 
 
-class TestOptions:
+class MntEncoderInferenceOptions:
 
     def __init__(self):
         self.parser = ArgumentParser()
         self.initialize()
 
     def initialize(self):
-        ''' arguments for inference script '''
+        ''' arguments for inference_mnt_encoder script '''
 
         # Paths
         self.parser.add_argument('--exp_dir', type=str, help='Path to experiment output directory')

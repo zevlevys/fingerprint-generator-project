@@ -7,10 +7,11 @@ class TransformsConfig(object):
     def __init__(self, opts):
         self.opts = opts
 
-        if self.opts.input_nc == 1:
-            self.normalization_vec_source = 0.5
-        else:
-            self.normalization_vec_source = [0.5, 0.5, 0.5]
+        if hasattr(self.opts, 'input_nc'):
+            if self.opts.input_nc == 1:
+                self.normalization_vec_source = 0.5
+            else:
+                self.normalization_vec_source = [0.5, 0.5, 0.5]
 
         if self.opts.label_nc == 1:
             self.normalization_vec_target = 0.5
