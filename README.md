@@ -64,12 +64,12 @@ Here, we are using out Fingerprint attribute editor, based on SeFa [2] algorithm
 ### Installation
 - Clone this repo:
 ``` 
-git clone https://github.com/rafaelbou/pixel2style2pixel.git
-cd pixel2style2pixel
+git clone https://github.com/rafaelbou/fingerprint-generator.git
+cd fingerprint-generator
 ```
 - Dependencies:  
 We recommend running this repository using [Anaconda](https://docs.anaconda.com/anaconda/install/).  
-All dependencies for defining the environment are provided in `environment/fingergen_env.yaml`.
+All dependencies for defining the environment are provided in `environment/environment.yaml`.
 
 
 ### Pretrained Models
@@ -81,8 +81,21 @@ Please download the pre-trained models from the following links.
 
 If you wish to use one of the pretrained models for training or inference, you may do so using the flag `--checkpoint_path`.
 
-## Training
-### Preparing your Data
+## Data Preparation
+### Minutiae Map Creation
+In order to train the Minutiae-To-Vec encoder, you need to convert a minutiae set into a minutiae map.
+
+#### Minutiae set format
+The minutiae set should be in text file which each row represent a minutia point in the format:
+`minutia-type x y orientation`
+ - minutiae-type: 1=Bifurcation, 2=Termination, 4=Loop, 5=Delta
+ - x,y: The coordinate of the point in pixels.
+ - orientation: The orientation of point in degrees.
+ 
+#### Minutiae map creation
+For the minutiae maps creation run the script in `./utils/preprocessing_utils.py`.  
+
+### Preparing your data for training
 - Currently, we provide support for Synthesis and Reconstruction datasets and experiments.
     - Refer to `configs/paths_config.py` to define the necessary data paths and model paths for training and evaluation. 
     - Refer to `configs/transforms_config.py` for the transforms defined for each dataset/experiment. 
@@ -92,12 +105,12 @@ If you wish to use one of the pretrained models for training or inference, you m
     1. `data_configs.py` to define your data paths.
     2. `transforms_configs.py` to define your own data transforms.
 
-### Training Scripts
+## Training
 The main training scripts can be found in `scripts/train_generator.py` and `scripts/train_mnt_encoder.py` for synthesis an reconstruction tasks, respectively.   
 Intermediate training results are saved to `opts.exp_dir`. This includes checkpoints, train outputs, and test outputs.  
 Additionally, if you have tensorboard installed, you can visualize tensorboard logs in `opts.exp_dir/logs`.
 
-#### **Synthesis - Fingerprint Generator**
+### **Synthesis - Fingerprint Generator**
 ```
 python scripts/train_generator.py 
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -109,7 +122,7 @@ python scripts/train_generator.py
 --save_interval=5000
 ```
 
-#### **Reconstruction - Minutiae-to-Vec Encoder**
+### **Reconstruction - Minutiae-to-Vec Encoder**
 ```
 python scripts/train_mnt_encoder.py
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -130,14 +143,14 @@ python scripts/train_mnt_encoder.py
 --save_interval=5000
 ```
 
-##### Additional Notes
+#### Additional Notes
 - See `options/train_options.py` for all training-specific flags.
 - If you wish to resume from a specific checkpoint, you may do so using `--checkpoint_path`.
 
 ## Inference
 The main inference scripts can be found in `scripts/inference_generator.py` and `scripts/inference_mnt_encoder.py` for synthesis and reconstruction tasks, respectively.
 
-#### Synthesis
+### Synthesis
 ```
 python scripts/inference_generator.py \
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -146,7 +159,7 @@ python scripts/inference_generator.py \
 --n_image=20
 ```
 
-#### Reconstruction
+### Reconstruction
 ```
 python scripts/inference_mnt_encoder.py \
 --exp_dir=<OUTPUT FOLDER PATH>
@@ -155,16 +168,16 @@ python scripts/inference_mnt_encoder.py \
 --resize_output
 ```
 
-##### Additional Notes
+#### Additional Notes
 - See `options/test_options.py` for all test-specific flags.
 - During inference, the options used during training are loaded from the saved checkpoint and are then updated using the 
 test options passed to the inference script.  For example, there is no need to pass `--dataset_type` or `--label_nc` to the 
  inference script, as they are taken from the loaded `opts`.
 
-### Fingerprint Attribute Editor
+## Fingerprint Attribute Editor
 The main scripts can be found in `fingerprint_attribute_editor/closed_form_factorization.py` and `fingerprint_attribute_editor/attribute_editor.py` for calculating and applying the latent semantic directions, respectively.
 
-#### Closed form factorization
+### Closed form factorization
 This script is used to estimate the latent semantic directions in w that modify particular fingerprint attributes while preserving their identity
 ```
 python fingerprint_attribute_editor/closed_form_factorization.py
@@ -172,7 +185,7 @@ python fingerprint_attribute_editor/closed_form_factorization.py
 --checkpoint_path=<PATH TO PRETRAINED STYLEGAN2 MODEL>
 ```
 
-#### Attribute Editor
+### Attribute Editor
 This script is used to apply on of the latent semantic directions in order to edit the generated fingerprint attributes.
 
 ```
@@ -188,7 +201,7 @@ python fingerprint_attribute_editor/attribute_editor.py
 --number_of_outputs=5
 ```
 
-##### Additional Notes
+#### Additional Notes
 - The output of the closed_form_factorization.py script, factor.pt file, will be saved to exp_dir.
 - The attribute_editor.py script will output three different images, backward, original and forward, for each generated fingerprint.
 - See `fingerprint_attribute_editor/attribute_editor_options.py` for all attribute_editor flags. 
