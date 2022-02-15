@@ -81,6 +81,19 @@ Please download the pre-trained models from the following links.
 
 If you wish to use one of the pretrained models for training or inference, you may do so using the flag `--checkpoint_path`.
 
+## SynFing Dataset
+The SynFing dataset consists of 100K pairs of synthetic rolled fingerprints created using the proposed
+fingerprint generator and attributes modifier.  Each pair of impressions shares the same synthetic identity but differs in
+visual attributes, such as scribbles and dry-skin artifacts.  
+
+SynFing dataset is available at:
+ - [part_0](https://www.dropbox.com/s/1urw9h0mit6xnvf/%D7%A8%D7%A4%D7%90%D7%9C%20%D7%91%D7%95%D7%96%D7%92%D7%9C%D7%95%20-%20SynFing.zip?dl=0)
+ - [part_1](https://www.dropbox.com/s/jjdeo8gym5o8tra/%D7%A8%D7%A4%D7%90%D7%9C%20%D7%91%D7%95%D7%96%D7%92%D7%9C%D7%95%20-%20SynFing.z01?dl=0)
+ - [part_2](https://www.dropbox.com/s/2f2bse24lglz11b/%D7%A8%D7%A4%D7%90%D7%9C%20%D7%91%D7%95%D7%96%D7%92%D7%9C%D7%95%20-%20SynFing.z02?dl=0)
+ - [part_3](https://www.dropbox.com/s/0e75dbn6fhjsy9i/%D7%A8%D7%A4%D7%90%D7%9C%20%D7%91%D7%95%D7%96%D7%92%D7%9C%D7%95%20-%20SynFing.z03?dl=0)
+ - [part_4](https://www.dropbox.com/s/2ha5rbzmmjf18nk/%D7%A8%D7%A4%D7%90%D7%9C%20%D7%91%D7%95%D7%96%D7%92%D7%9C%D7%95%20-%20SynFing.z04?dl=0)
+ 
+ 
 ## Data Preparation
 ### Minutiae Map Creation
 In order to train the Minutiae-To-Vec encoder, you need to convert a minutiae set into a minutiae map.
