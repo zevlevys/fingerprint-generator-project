@@ -77,7 +77,7 @@ Please download the pre-trained models from the following links.
 | Path | Description
 | :--- | :----------
 |[fingerprint_synthesis](https://drive.google.com/file/d/1BRqgVCa5PUeR0Unkz2ym13XXebrjJSpP/view?usp=sharing)  | Model trained with the NIST SD14 dataset for fingerprint synthesis.
-|[fingerprint_reconstruction](https://drive.google.com/file/d/1qTsTKZW13C1FeMhqahiNdpTWqyBDPIwm/view?usp=share_link)  | Model trained with the NIST SD14 dataset for fingerprint reconstruction from minutiae set.
+|[fingerprint_reconstruction](https://www.dropbox.com/s/pvkg6e5cq8mdpa2/best_model.pt?dl=0)  | Model trained with the NIST SD14 dataset for fingerprint reconstruction from minutiae set.
 
 If you wish to use one of the pretrained models for training or inference, you may do so using the flag `--checkpoint_path`.
 
