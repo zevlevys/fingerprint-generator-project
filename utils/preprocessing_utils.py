@@ -54,27 +54,31 @@ def create_map_scipy(mnts, size=(768, 832), num_of_maps=3, ori_length=15, mnt_si
         types = [[1], [2], [4, 5]]
     else:
         types = [[1], [2], [-1]]
-
     for idx in range(num_of_maps):
-        map = np.zeros(size)
+        _map = np.zeros(size)
         map_ori = np.zeros(size)
         for mnt_type in types[idx]:
+            print(mnt_type)
             x = mnts[mnts[:, 0] == mnt_type, 1].astype(np.int32).tolist()
+            print(x)
             y = mnts[mnts[:, 0] == mnt_type, 2].astype(np.int32).tolist()
             o = mnts[mnts[:, 0] == mnt_type, 3]
-            map[[y, x]] = 1
+            # This line is a real fucker
+            _map[(y, x)] = 0.5
 
             if mnt_type in [1, 2]:
                 for x_l, y_l, o_l in zip(x, y, o):
+                    print(x_l, y_l, o_l)
                     x1, x2, y1, y2 = (x_l, x_l + ori_length * np.cos(o_l), y_l, y_l + ori_length * np.sin(o_l))
                     line_idx = line_nd((y1, x1), (y2, x2), endpoint=True)
                     map_ori[line_idx] = 1
 
-        if mnt_type in [4, 5]:
-            mnt_sigma = 25
-            mnt_gain = mnt_gain * 3
-        map_blur = sc.gaussian_filter(map, sigma=np.sqrt(mnt_sigma))[:, :, np.newaxis] * mnt_gain
+            if mnt_type in [4, 5]:
+                mnt_sigma = 25
+                mnt_gain = mnt_gain * 3
+        map_blur = sc.gaussian_filter(_map, sigma=np.sqrt(mnt_sigma))[:, :, np.newaxis] * mnt_gain
         map_ori_blur = sc.gaussian_filter(map_ori, sigma=np.sqrt(ori_sigma))[:, :, np.newaxis] * ori_gain
+        # maps.append(_map[:, :, np.newaxis] + map_ori[:, :, np.newaxis])
         maps.append(map_blur + map_ori_blur)
     output = np.concatenate(maps, axis=-1)
     output = output * 255
@@ -99,9 +103,9 @@ def create_map_scipy_without_ori(mnt_dict_list, size=(768, 832), num_of_maps=3):
 def main():
     # input arguments
     include_singular = False
-    imgs_path = '< PATH TO THE FINGERPRINT IMAGES FOLDER (IN TIF FORMAT) >'
-    txts_path = '< PATH TO THE MINUTIAE SET TEXT FILES FOLDER >'
-    output_path = '< PATH TO THE OUTPUT FOLDER >'
+    imgs_path = '/home/zev/projects/OAI/fingerprint-generator/samples/tifs/'
+    txts_path = '/home/zev/projects/OAI/fingerprint-generator/samples/txts/'
+    output_path = '/home/zev/projects/OAI/fingerprint-generator/output/'
 
     # create output folder if not exist
     if not os.path.exists(output_path):
@@ -114,7 +118,8 @@ def main():
         try:
             mnt_file_path = os.path.join(txts_path, img_name.replace('tif', 'txt'))
             mnt = parse_minute_file(mnt_file_path)
-            map = create_map_scipy(mnt, include_singular=include_singular, ori_gain=3, size=(512, 512))
+            print(mnt)
+            map = create_map_scipy(mnt, include_singular=include_singular, ori_gain=3, size=(300,300))
             plt.imsave(os.path.join(output_path, img_name[:-4] + '.png'), map)
 
         except IndexError:
