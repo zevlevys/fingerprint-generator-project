@@ -10,6 +10,10 @@ from torch.nn import functional as F
 from torch.utils import data
 from torchvision import utils
 from tqdm import tqdm
+import sys
+sys.path.append(".")
+sys.path.append("..")
+
 
 # dataset
 from configs import data_configs
