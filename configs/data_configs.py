@@ -29,4 +29,11 @@ DATASETS = {
 		'test_source_root': dataset_paths['nist_sd4_mnt_test'],
 		'test_target_root': dataset_paths['nist_sd4_mnt_gt_test'],
 	},
+  'sample_data_set': {
+    'transforms': transforms_config.FingerprintSynthesisTransforms,
+    'train_source_root': '/content/drive/MyDrive/data_set_sample/train',
+		'train_target_root': '/content/drive/MyDrive/data_set_sample/train',
+		'test_source_root': '',
+		'test_target_root': '',
+  }
 }

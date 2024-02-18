@@ -10,6 +10,10 @@ from torch.nn import functional as F
 from torch.utils import data
 from torchvision import utils
 from tqdm import tqdm
+import sys
+sys.path.append(".")
+sys.path.append("..")
+
 
 # dataset
 from configs import data_configs
@@ -274,7 +278,7 @@ class GeneratorCoach:
                     f"{self.opts.exp_dir}/sample/{str(i).zfill(6)}.png",
                     nrow=int(self.opts.n_sample ** 0.5),
                     normalize=True,
-                    range=(-1, 1),
+                    value_range=(-1, 1),
                 )
 
 
