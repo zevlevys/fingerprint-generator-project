@@ -1,8 +1,9 @@
 import scipy.misc
 import imageio
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFile
 import os
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def imread(path):
     return Image.open(path).convert('L')
@@ -22,7 +23,7 @@ def parse_minute_file(mnt_file_path):
     try:
         mnt = np.loadtxt(mnt_file_path)[:, :4]
     except:
-        return []
+        return np.array([])
     mnt[:, -1] = (360 - mnt[:, -1]) * np.pi / 180
     return mnt
 
@@ -36,7 +37,7 @@ def main():
         image = imread(base_path + 'test/' + file)
         w,h = image.size
         mnt = parse_minute_file(base_path + 'test_mintxt/' + file[:-4] + '.txt')
-        if mnt == []:
+        if mnt.size == 0:
             corrupted += 1
             continue
         max_w = min(w, mnt[:, 1].max() + int(w/6))
@@ -57,7 +58,7 @@ def main():
 
         imageio.imsave(base_path + 'test_cropped/cropped-' + file[:-4] + '.png', new_image)
         i += 1
-        if (i % 1000):
+        if (i % 1000 == 0):
             print('Hit', i, 'images with', corrupted, 'corrupted images')
 
 
