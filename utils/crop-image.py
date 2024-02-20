@@ -28,13 +28,16 @@ def parse_minute_file(mnt_file_path):
 
 
 def main():
-    base_path = '/home/zev/projects/OAI/older-fingerprint-repo/'
-    for file in os.listdir(base_path + 'test/')[:1000]:
+    base_path = '/home/zev/projects/OAI/fingerprint-generator-project/fingerprint_dataset'
+    i = 0
+    corrupted = 0
+    for file in os.listdir(base_path + 'test/'):
         # print(file)
         image = imread(base_path + 'test/' + file)
         w,h = image.size
         mnt = parse_minute_file(base_path + 'test_mintxt/' + file[:-4] + '.txt')
         if mnt == []:
+            corrupted += 1
             continue
         max_w = min(w, mnt[:, 1].max() + int(w/6))
         min_w = max(0, mnt[:, 1].min() - int(w/6))
@@ -53,6 +56,9 @@ def main():
         new_image = get_image(image, left, top, right, bottom)
 
         imageio.imsave(base_path + 'test_cropped/cropped-' + file[:-4] + '.png', new_image)
+        i += 1
+        if (i % 1000):
+            print('Hit', i, 'images with', corrupted, 'corrupted images')
 
 
 if __name__ == '__main__':
