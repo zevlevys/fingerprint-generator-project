@@ -21,7 +21,7 @@ dataset_paths = {
 }
 
 model_paths = {
-    'stylegan_weights': '/hdd/PycharmProjects/fingerprints/stylegan2-pytorch_origin/checkpoint/480000.pt ',
-    'encoder_pretrained': '/hdd/PycharmProjects/fingerprints/pixel2style2pixel/pretrained_models/model_ir_se50.pth',
-    'fingernet': '/hdd/PycharmProjects/fingerprints/pixel2style2pixel/pretrained_models/fingerNet.pth'
+    'stylegan_weights': '/content/drive/MyDrive/OAI/style_gan_weights.pt',
+    'encoder_pretrained': '/content/drive/MyDrive/OAI/model_ir_se50.pth',
+    'fingernet': '/content/drive/MyDrive/OAI/fingerNet.pth'
 }
