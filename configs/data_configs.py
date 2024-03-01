@@ -31,9 +31,9 @@ DATASETS = {
 	},
   'sample_data_set': {
     'transforms': transforms_config.FingerprintSynthesisTransforms,
-    'train_source_root': '/content/drive/MyDrive/data_set_sample/train',
-		'train_target_root': '/content/drive/MyDrive/data_set_sample/train',
-		'test_source_root': '',
-		'test_target_root': '',
+    'train_source_root': '/content/retaining_id/train',
+		'train_target_root': '/content/target/train',
+		'test_source_root': '/content/retaining_id/test',
+		'test_target_root': '/content/target/test',
   }
 }
