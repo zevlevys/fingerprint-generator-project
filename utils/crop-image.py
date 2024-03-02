@@ -31,6 +31,8 @@ def parse_minute_file(mnt_file_path):
 
 def main(dataset="train", base_path):
     # base_path = '/home/zev/projects/OAI/fingerprint-generator-project/fingerprint_dataset'
+    print(f'{dataset}=, {base_path}=')
+    
     i = 0
     corrupted = 0
     for file in os.listdir(base_path + f'{dataset}/'):
