@@ -37,9 +37,13 @@ def main(base_path, dataset="train"):
     corrupted = 0
     for file in os.listdir(base_path + f'{dataset}/'):
         # print(file)
-        image = imread(base_path + f'{dataset}/' + file)
-        w,h = image.size
-        mnt = parse_minute_file(base_path + f'{dataset}_mintxt/' + file[:-4] + '.txt')
+        try:
+            image = imread(base_path + f'{dataset}/' + file)
+            w,h = image.size
+            mnt = parse_minute_file(base_path + f'{dataset}_mintxt/' + file[:-4] + '.txt')
+        except Exception as e:
+            print(f'During loading the file {image}, mnt {mnt} the exception {e} occured')
+            continue
         if mnt.size == 0:
             corrupted += 1
             continue
