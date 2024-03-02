@@ -13,8 +13,8 @@ def imread(path):
 def get_image(x, left, top, right, bottom):
     # print(image.size)
     # input_height, input_width = image.size
-    resize_h = 512
-    resize_w = 512
+    resize_h = 256
+    resize_w = 256
     x = x.crop((left, top, right, bottom))
     x = x.resize((resize_h, resize_w))
     return x
