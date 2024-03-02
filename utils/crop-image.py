@@ -29,7 +29,7 @@ def parse_minute_file(mnt_file_path):
     return mnt
 
 
-def main(dataset="train", base_path):
+def main(base_path, dataset="train"):
     # base_path = '/home/zev/projects/OAI/fingerprint-generator-project/fingerprint_dataset'
     print(f'{dataset}=, {base_path}=')
     
@@ -70,4 +70,4 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dataset') 
     parser.add_argument('-p', '--base_path')
     args = parser.parse_args()
-    main(args.dataset, args.base_path)
+    main(args.base_path, args.dataset)
