@@ -23,5 +23,5 @@ dataset_paths = {
 model_paths = {
     'stylegan_weights': '/content/drive/MyDrive/OAI/style_gan_weights.pt',
     'encoder_pretrained': '/content/drive/MyDrive/OAI/model_ir_se50.pth',
-    'fingernet': '/content/drive/MyDrive/OAI/fingerNet.pth'
+    'fingernet': '/content/drive/MyDrive/OAI/fingerNet.h5'
 }
