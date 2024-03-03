@@ -4,6 +4,7 @@ import pprint
 import random
 
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import sys
@@ -11,7 +12,6 @@ sys.path.append(".")
 sys.path.append("..")
 from options.train_mnt_encoder_options import MntEncoderTrainOptions
 
-matplotlib.use('Agg')
 
 import torch
 from torch import nn
