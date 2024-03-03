@@ -30,10 +30,10 @@ DATASETS = {
 		'test_target_root': dataset_paths['nist_sd4_mnt_gt_test'],
 	},
   'retaining_id': {
-    		'transforms': transforms_config.FingerprintSynthesisTransforms,
-    		'train_source_root': '/content/retaining_id/train',
-		'train_target_root': '/content/target/train',
-		'test_source_root': '/content/retaining_id/test',
-		'test_target_root': '/content/target/test',
+    		'transforms': transforms_config.MntToFingerTransforms,
+    		'train_source_root': '/content/train_cropped_maps',
+		'train_target_root': '/content/content/retaining_id/train_cropped',
+		'test_source_root': '/content/test_cropped_maps',
+		'test_target_root': '/content/content/retaining_id/test_cropped',
   }
 }
