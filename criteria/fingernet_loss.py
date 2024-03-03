@@ -5,7 +5,7 @@ import torch.nn as nn
 from scipy import sparse, spatial
 
 import matplotlib
-matplotlib.use('Qt5Agg')
+# matplotlib.use('Qt5Agg')
 
 from configs.paths_config import model_paths
 
