@@ -5,6 +5,8 @@ import random
 
 import matplotlib
 import matplotlib.pyplot as plt
+
+import sys
 sys.path.append(".")
 sys.path.append("..")
 from options.train_mnt_encoder_options import MntEncoderTrainOptions
