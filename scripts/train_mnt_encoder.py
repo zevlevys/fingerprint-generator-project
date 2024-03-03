@@ -5,7 +5,8 @@ import random
 
 import matplotlib
 import matplotlib.pyplot as plt
-
+sys.path.append(".")
+sys.path.append("..")
 from options.train_mnt_encoder_options import MntEncoderTrainOptions
 
 matplotlib.use('Agg')
