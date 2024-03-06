@@ -3,6 +3,10 @@ import random
 import numpy as np
 
 import torch
+import sys
+sys.path.append(".")
+sys.path.append("..")
+
 from utils.common import tensor2im
 from tqdm import tqdm
 from PIL import Image
