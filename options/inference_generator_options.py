@@ -51,7 +51,7 @@ class GeneratorInferenceOptions:
                                  )
 
         self.parser.add_argument('--output_mode',
-                                type=string,
+                                type=str,
                                 default='single',
                                 help="Save the images from inference in single or grid"
                                )
