@@ -15,6 +15,7 @@ sys.path.append("..")
 from configs import data_configs
 from datasets.inference_dataset import InferenceDataset
 from utils.common import tensor2im
+from torchvision.utils import make_grid
 from options.inference_mnt_encoder_options import MntEncoderInferenceOptions
 from models.fingergen import FingerGen
 
