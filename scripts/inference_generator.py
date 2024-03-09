@@ -10,7 +10,7 @@ sys.path.append("..")
 from utils.common import tensor2im
 from tqdm import tqdm
 from PIL import Image
-
+from torchvision.utils import make_grid
 from models.stylegan2.model import Generator
 from options.inference_generator_options import GeneratorInferenceOptions
 
@@ -31,22 +31,28 @@ def run():
     checkpoint = torch.load(test_opts.checkpoint_path)
 
     g_ema.load_state_dict(checkpoint["g_ema"])
-
+    
     with torch.no_grad():
         g_ema.eval()
+        images = []
         for i in tqdm(range(test_opts.n_images)):
             sample_z = torch.randn(test_opts.sample, test_opts.latent, device=device)
 
             sample, _ = g_ema(
                 [sample_z], truncation=1.0, truncation_latent=None
             )
-
-            result = tensor2im(sample[0])
-
-            if test_opts.resize_factor is not None:
-                result = result.resize((int(test_opts.resize_factor), int(test_opts.resize_factor)))
-            im_save_path = f"{test_opts.exp_dir}/{str(i).zfill(6)}.png"
-            Image.fromarray(np.array(result)).save(im_save_path, dpi=(500, 500))
+            if test_opts.output_mode == "show":
+                images.append(sample[0])
+            else:
+                
+                result = tensor2im(sample[0])
+    
+                if test_opts.resize_factor is not None:
+                    result = result.resize((int(test_opts.resize_factor), int(test_opts.resize_factor)))
+                im_save_path = f"{test_opts.exp_dir}/{str(i).zfill(6)}.png"
+                Image.fromarray(np.array(result)).save(im_save_path, dpi=(500, 500))
+        if test_opts.output_mode == "show":
+            make_grid(images, nrow=3)
 
 
 if __name__ == "__main__":
