@@ -50,10 +50,10 @@ class GeneratorInferenceOptions:
                                  help="number of samples to be generated for each image",
                                  )
 
-        sef.parser_add_argument('--output_mode',
+        self.parser.add_argument('--output_mode',
                                 type=string,
-                                default='save',
-                                help="Save the images from inference or plot show them"
+                                default='single',
+                                help="Save the images from inference in single or grid"
                                )
 
     def parse(self):
