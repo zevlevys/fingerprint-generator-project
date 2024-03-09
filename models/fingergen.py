@@ -78,7 +78,8 @@ class FingerGen(nn.Module):
                 else:
                     codes[:, i] = 0
 
-        input_is_latent = not input_code
+        # input_is_latent = not input_code
+        input_is_latent = input_code
         images, result_latent = self.decoder([codes],
                                              input_is_latent=input_is_latent,
                                              randomize_noise=randomize_noise,
