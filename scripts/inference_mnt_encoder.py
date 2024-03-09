@@ -15,10 +15,31 @@ sys.path.append("..")
 from configs import data_configs
 from datasets.inference_dataset import InferenceDataset
 from utils.common import tensor2im
-from torchvision.utils import make_grid
 from options.inference_mnt_encoder_options import MntEncoderInferenceOptions
 from models.fingergen import FingerGen
 
+
+def combine_images(columns, space, images, save_path):
+    rows = len(images) // columns
+    if len(images) % columns:
+        rows += 1
+    width_max = max([Image.open(image).width for image in images])
+    height_max = max([Image.open(image).height for image in images])
+    background_width = width_max*columns + (space*columns)-space
+    background_height = height_max*rows + (space*rows)-space
+    background = Image.new('RGBA', (background_width, background_height), (255, 255, 255, 255))
+    x = 0
+    y = 0
+    for i, image in enumerate(images):
+        img = Image.open(image)
+        x_offset = int((width_max-img.width)/2)
+        y_offset = int((height_max-img.height)/2)
+        background.paste(img, (x+x_offset, y+y_offset))
+        x += width_max + space
+        if (i+1) % columns == 0:
+            y += height_max + space
+            x = 0
+    background.save(save_path)
 
 def run():
     test_opts = MntEncoderInferenceOptions().parse()
@@ -85,7 +106,7 @@ def run():
                 res = np.concatenate([np.array(source.resize(resize_amount)),
                                       np.array(result.resize(resize_amount))], axis=1)
                 if opts.output_mode == "grid":
-                    images.append(res)
+                    images.append(Image.fromarray(res))
                 else:
                     Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
@@ -107,9 +128,7 @@ def run():
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))
     if opts.output_mode == "grid":
-        grid = make_grid(images, nrow=3)
-        grid_im = tensor2im(grid)
-        Image.fromarray(grid_im).save(os.path.join(out_path_coupled, "grid.png"))
+        combine_images(3, 1, images, os.path.join(out_path_inputs, "grid.png"))
     print(result_str)
 
     with open(stats_path, 'w') as f:
