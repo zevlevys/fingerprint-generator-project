@@ -61,6 +61,7 @@ def run():
 
     global_i = 0
     global_time = []
+    images = []
     for input_batch in tqdm(dataloader):
         if global_i >= opts.n_images:
             break
@@ -70,7 +71,7 @@ def run():
             result_batch = run_on_batch(input_cuda, net, opts)
             toc = time.time()
             global_time.append(toc - tic)
-
+        
         for i in range(opts.test_batch_size):
             result = tensor2im(result_batch[i])
             im_path = dataset.paths[global_i]
@@ -79,9 +80,13 @@ def run():
             resize_amount = (int(opts.resize_factor), int(opts.resize_factor)) if opts.resize_outputs else (512, 512)
 
             if opts.couple_outputs:
+                
                 res = np.concatenate([np.array(source.resize(resize_amount)),
                                       np.array(result.resize(resize_amount))], axis=1)
-                Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
+                if opts.output_mode == "grid":
+                    images.append(res)
+                else:
+                    Image.fromarray(res).save(os.path.join(out_path_coupled, os.path.basename(im_path)))
 
             else:
                 # save result
@@ -100,6 +105,10 @@ def run():
 
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))
+    if opts.output_mode == "grid":
+        grid = make_grid(images, nrow=3)
+        grid_im = tensor2im(grid)
+        Image.fromarray(grid_im).save(os.path.join(out_path_coupled, "grid.png"))
     print(result_str)
 
     with open(stats_path, 'w') as f:
