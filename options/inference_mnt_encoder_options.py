@@ -38,6 +38,12 @@ class MntEncoderInferenceOptions:
         self.parser.add_argument('--latent_mask', type=str, default=None,
                                  help='Comma-separated list of latents to perform style-mixing with')
 
+        self.parser.add_argument('--output_mode',
+                                type=str,
+                                default='single',
+                                help="Save the images from inference in single or grid"
+                               )
+
     def parse(self):
         opts = self.parser.parse_args()
         return opts
