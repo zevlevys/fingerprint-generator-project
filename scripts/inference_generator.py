@@ -41,7 +41,7 @@ def run():
             sample, _ = g_ema(
                 [sample_z], truncation=1.0, truncation_latent=None
             )
-            if test_opts.output_mode == "show":
+            if test_opts.output_mode == "grid":
                 images.append(sample[0])
             else:
                 
@@ -51,9 +51,11 @@ def run():
                     result = result.resize((int(test_opts.resize_factor), int(test_opts.resize_factor)))
                 im_save_path = f"{test_opts.exp_dir}/{str(i).zfill(6)}.png"
                 Image.fromarray(np.array(result)).save(im_save_path, dpi=(500, 500))
-        if test_opts.output_mode == "show":
-            make_grid(images, nrow=3)
-
+        if test_opts.output_mode == "grid":
+            grid = make_grid(images, nrow=3, )
+            grid_im = tensor2im(grid)
+            im_save_path = f"{test_opts.exp_dir}/grid.png"
+            Image.fromarray(np.array(grid_im)).save(im_save_path, dpi=(500, 500))
 
 if __name__ == "__main__":
     # Set random seed
