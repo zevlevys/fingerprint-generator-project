@@ -56,7 +56,7 @@ class FingerGen(nn.Module):
                 self.__load_latent_avg(ckpt, repeat=self.opts.style_count)
 
     def forward(self, x, resize=True, latent_mask=None, input_code=False, randomize_noise=True,
-                inject_latent=None, return_latents=False, alpha=None):
+                inject_latent=None, return_latents=False, alpha=None, attempt_OAI_fix=False):
         if input_code:
             codes = x
         else:
@@ -78,8 +78,10 @@ class FingerGen(nn.Module):
                 else:
                     codes[:, i] = 0
 
-        # input_is_latent = not input_code
-        input_is_latent = input_code
+        if attempt_OAI_fix:
+            input_is_latent = input_code
+        else:
+            input_is_latent = not input_code
         images, result_latent = self.decoder([codes],
                                              input_is_latent=input_is_latent,
                                              randomize_noise=randomize_noise,

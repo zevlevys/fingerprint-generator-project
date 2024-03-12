@@ -83,7 +83,7 @@ class MntEncoderCoach:
                 self.optimizer.zero_grad()
                 x, y = batch
                 x, y = x.to(self.device).float(), y.to(self.device).float()
-                y_hat, latent = self.net.forward(x, return_latents=True)
+                y_hat, latent = self.net.forward(x, return_latents=True, attempt_OAI_fix=self.opts.attempt_OAI_fix)
                 loss, loss_dict, id_logs = self.calc_loss(x, y, y_hat, latent)
                 loss.backward()
                 self.optimizer.step()

@@ -58,6 +58,9 @@ class MntEncoderTrainOptions:
         self.parser.add_argument('--test_workers', default=2, type=int,
                                  help='Number of test/inference dataloader workers')
 
+        self.parser.add_argument('--attempt_OAI_fix', action='store_true', help='Whether to try the OAI fix')
+        
+
     def parse(self):
         opts = self.parser.parse_args()
         return opts

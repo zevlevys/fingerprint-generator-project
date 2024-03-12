@@ -128,7 +128,7 @@ def run():
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))
     if opts.output_mode == "grid":
-        combine_images(3, 1, images, os.path.join(out_path_coupled, "grid.png"))
+        combine_images(3, 1, images, os.path.join(out_path_grid, "grid.png"))
     print(result_str)
 
     with open(stats_path, 'w') as f:
@@ -137,7 +137,7 @@ def run():
 
 def run_on_batch(inputs, net, opts):
     if opts.latent_mask is None:
-        result_batch = net(inputs, randomize_noise=False, resize=opts.resize_outputs)
+        result_batch = net(inputs, randomize_noise=False, resize=opts.resize_outputs, attempt_OAI_fix=opts.attempt_OAI_fix)
     else:
         latent_mask = [int(l) for l in opts.latent_mask.split(",")]
         result_batch = []

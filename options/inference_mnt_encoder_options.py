@@ -43,6 +43,8 @@ class MntEncoderInferenceOptions:
                                 default='single',
                                 help="Save the images from inference in single or grid"
                                )
+        self.parser.add_argument('--attempt_OAI_fix', action='store_true', help='Whether to try the OAI fix')
+
 
     def parse(self):
         opts = self.parser.parse_args()
