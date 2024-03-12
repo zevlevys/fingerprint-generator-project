@@ -116,7 +116,7 @@ def run():
                 if opts.resize_factor is not None:
                     result = result.resize(resize_amount)
                 if opts.output_mode == "grid":
-                    images.append(Image.fromarray(result))
+                    images.append(result)
                 else:
                     Image.fromarray(np.array(result)).save(output_im_save_path, dpi=(500, 500))
                 
