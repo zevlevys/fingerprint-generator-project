@@ -128,7 +128,7 @@ def run():
     stats_path = os.path.join(opts.exp_dir, 'stats.txt')
     result_str = 'Runtime {:.4f}+-{:.4f}'.format(np.mean(global_time), np.std(global_time))
     if opts.output_mode == "grid":
-        combine_images(3, 1, images, os.path.join(out_path_grid, "grid.png"))
+        combine_images(3, 1, images, os.path.join(out_path_results, "grid.png"))
     print(result_str)
 
     with open(stats_path, 'w') as f:
