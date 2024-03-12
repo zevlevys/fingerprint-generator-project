@@ -115,8 +115,11 @@ def run():
                 output_im_save_path = os.path.join(out_path_results, os.path.basename(im_path))
                 if opts.resize_factor is not None:
                     result = result.resize(resize_amount)
-                Image.fromarray(np.array(result)).save(output_im_save_path, dpi=(500, 500))
-
+                if opts.output_mode == "grid":
+                    images.append(Image.fromarray(result))
+                else:
+                    Image.fromarray(np.array(result)).save(output_im_save_path, dpi=(500, 500))
+                
                 # save input mnt
                 input_im_save_path = os.path.join(out_path_inputs, os.path.basename(im_path))
                 if opts.resize_factor is not None:
